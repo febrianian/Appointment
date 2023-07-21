@@ -17,8 +17,7 @@ builder.Services.AddDbContext<AppointmentContext>(options =>
 });
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppointmentContext>()
-    .AddDefaultTokenProviders();
+    .AddEntityFrameworkStores<AppointmentContext>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
