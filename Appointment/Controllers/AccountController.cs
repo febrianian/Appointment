@@ -50,6 +50,12 @@ namespace Appointment.Controllers
 
         public async Task<IActionResult> Register()
         {
+            if (!_roleManager.RoleExistsAsync(Helper.Admin).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new IdentityRole(Helper.Admin));
+                await _roleManager.CreateAsync(new IdentityRole(Helper.Doctor));
+                await _roleManager.CreateAsync(new IdentityRole(Helper.Patient));
+            }
 
             return View();
         }
@@ -80,7 +86,7 @@ namespace Appointment.Controllers
                     {
                         TempData["newAdminSignUp"] = user.Name;
                     }
-                    return RedirectToAction("Index", "Appointment");
+                    return RedirectToAction("Index", "Home");
                 }
                 foreach (var error in result.Errors)
                 {
