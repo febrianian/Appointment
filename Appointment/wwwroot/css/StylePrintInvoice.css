@@ -1,0 +1,89 @@
+
+.bodytext {
+  font-family: "Times New Roman", Times, serif !important;
+  text-align: justify !important;
+  font-size: 15.50pt !important;
+  line-height: normal;
+  padding-left: 5px !important;
+  padding-right: 10px !important;
+  overflow: hidden;
+}
+
+.sectionscreen {
+  position: relative;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+  margin-top: 5cm;
+  margin-bottom: auto;
+  margin-left: 2.74cm;
+  margin-right: 1.33cm;
+  height: auto !important;
+}
+
+.copy {
+  float: right;
+  overflow: hidden;
+  font-weight: bold;
+  border: 1px solid black;
+  padding-right: 35px;
+  padding-left: 35px;
+
+}
+
+.tabletext {
+  font-family: "Times New Roman", Times, serif !important;
+  text-align: justify !important;
+  font-size: 13pt !important;
+  line-height: normal;
+  padding-left: 5px !important;
+  padding-right: 10px !important;
+  overflow: hidden;
+}
+
+.header {
+  font-family: "Times New Roman", Times, serif !important;
+  text-align: center !important;
+  font-size: 25pt !important;
+  font-weight: bold !important;
+  line-height: normal;
+  padding-bottom: 5px !important;
+}
+
+.nomorjaminan {
+  font-weight: bold;
+  float: left;
+}
+
+.nilai {
+  font-weight: bold;
+  float: right;
+}
+
+.tablenumber
+{
+    width: 30px;
+}
+
+.spantext {
+  font-weight: bold;
+}
+
+.signheader {
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 15.50pt !important;
+  line-height: normal;
+}
+
+.tablepadding {
+  padding-left: 5px !important;
+  padding-right: 10px !important;
+}
+
+.signtext {
+  font-weight: bold;
+  text-decoration: underline !important;
+  font-size: 15.50pt;
+  font-family: "Times New Roman", Times, serif !important;
+}
+

@@ -1,0 +1,54 @@
+﻿eQuotation BETA 1.2.2
+---------------------------------------------------------
+1. Update KPIController
+2. Update 2 Model :
+	1. SetupKPI
+	2. SetupKPIDetail
+
+3. KPI Form can now be accessed by year period
+
+eQuotation BETA 1.2.1
+---------------------------------------------------------
+1. Update BrokerQuotationController, ProcessQuotationController, QuotationResultController,
+ReinsuranceProcessController, ReviewQuotationController, CustomerApprovalController
+	1.A. Submit button is now replace with confirm button, so user will be prompt to confirm
+	before submitting change to database.
+	1.B. Check limit before submitting is now server side.
+	1.C. Check SumInsured or Share is now server side.
+2. Dashboard and DashboardSetup
+3. Email notification for every step taken using gmail account.
+4. UserManagementController
+	4.A. Edit is now functional
+	4.B. Searching
+
+eQuotation BETA 1.0.7
+---------------------------------------------------------
+1. QuotationResult/Process
+	1.A. Edit view to prevent sending log to over limit intended user
+
+eQuotation BETA 1.0.6
+---------------------------------------------------------
+1. ReportBrokerController
+	1.A. Change coding to display intended user in GetLog
+	1.B. Change coding to display intended user in ReportView
+	1.c. Change coding that bugged if LogBroker is doubled because an error occured before
+2. ReportView
+	2.A. Change coding to display intended user in log and history log
+	2.B. Change coding that bugged if LogBroker is doubled because an error occured before
+
+eQuotation BETA 1.0.5
+---------------------------------------------------------
+1. BrokerQuotationView
+	1.A. Change coding in currency selection to prevent selecting over limit intended user
+
+eQuotation BETA 1.0.4
+---------------------------------------------------------
+1. AccountController:
+	1.A. Change Password sudah dapat digunakan.
+	1.B. Profile page dalam tahap pembuatan.
+
+eQuotation BETA 1.0.3
+---------------------------------------------------------
+1. ReportBrokerController:
+	1.A. List Report sudah dapat diakses dan dilihat detailnya.
+
