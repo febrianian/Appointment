@@ -1,256 +1,54 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject UserManager<ApplicationUser> userManager
-@{
-    var userInfo = (await userManager?.GetUserAsync(User));
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>@ViewData["Title"] - eUser Annawier</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="~/plugins/datatables/dataTables.bootstrap.css">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
-    <!-- Select Picker-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
-    <!-- Tempusdominus Bbootstrap 4 -->
-    <link rel="stylesheet" href="~/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="~/plugins/datepicker/datepicker3.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-
-    <!--notification-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" crossorigin="anonymous" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AppointmentScheduling</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/fullcalendar@5.5.1/main.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2020.2.513/styles/kendo.default-v2.min.css" />
+    <link href="~/lib/select2/css/select2.css" rel="stylesheet" />
 </head>
+<body>
+    <header>
+        <nav class="navbar navbar-inverse navbar-expand-sm navbar-toggleable-sm navbar box-shadow mb-3">
+            <div class="container">
 
-<body class="sidebar-mini accent-primary text-sm">
-    <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-primary navbar-light">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Setup Dropdown Menu -->
-                <li class="nav-item">
-                    <button type="button" class="btn btn-light btn-sm" style="border-radius: 15px; padding: 1px;">
-                        <a asp-controller="Invoice" asp-action="CartList" class="nav-link @ViewBag.CartListActive">
-                            <i class="fas fa-shopping-cart"></i>
-                            Cart
-                        </a>
-                    </button>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="fa fa-cog"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <div class="dropdown-item">
-                            <div class="media">
-                                <div class="media-body">
-                                    <a asp-controller="Account" asp-action="Logout" class="btn btn-block btn-outline-secondary">Logout</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <div class="dropdown-item">
-                            <div class="media">
-                                <div class="media-body">
-                                    <a asp-controller="Account" asp-action="ChangePassword" asp-route-username="@User.Identity.Name" class="btn btn-block btn-outline-secondary">Change Password</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                    </div>
-                </li>
-            </ul>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
         </nav>
-        <!-- /.navbar -->
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a asp-controller="Home" asp-action="Index" class="brand-link navbar-warning">
-                <img src="~/dist/img/logoannawier.png" alt="Annawier Logo" class="brand-image img-rounded elevation-3"
-                     style="opacity: .8">
-                <span class="brand-text font-weight-bold">eUserAnnawier</span>
-            </a>
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="~/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        @{
-                            if (userInfo != null)
-                            {
-                                <a href="#" class="d-block">@userInfo.Email</a>
-                            }
-                        }
-                    </div>
-                </div>
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact" data-widget="treeview" role="menu" data-accordion="true">
-                        @if (User.IsInRole("eUserAnnawier-SuperUser"))
-                        {
-                            <li class="nav-header text-white text-bold">eUser External</li>
-                            <li class="nav-item has-treeview @ViewBag.UserSetupParent">
-                                <a href="" class="nav-link active">
-                                    <i class="fas fa-tools"></i>
-                                    <p>
-                                        Setup
-                                        <i class="fas fa-angle-left right"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a asp-controller="Company" asp-action="Index" class="nav-link @ViewBag.ListCompanyActive">
-                                            <i class="fas fa-dot-circle"></i>
-                                            <p>List Company</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a asp-controller="Division" asp-action="Index" class="nav-link @ViewBag.ListDivisionActive">
-                                            <i class="fas fa-dot-circle"></i>
-                                            <p>List Division</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a asp-controller="Position" asp-action="Index" class="nav-link @ViewBag.ListPositionActive">
-                                            <i class="fas fa-dot-circle"></i>
-                                            <p>List Position</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a asp-controller="Account" asp-action="Index" class="nav-link @ViewBag.ListUserActive">
-                                            <i class="fas fa-dot-circle"></i>
-                                            <p>List User</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a asp-controller="Account" asp-action="IndexRoles" class="nav-link @ViewBag.ListRolesActive">
-                                            <i class="fas fa-dot-circle"></i>
-                                            <p>List Roles</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h2 class="m-0 text-dark">@ViewData["Title"]</h2>
-                        </div><!-- /.col -->
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item">@ViewData["Title"]</li>
-                                <li class="breadcrumb-item active">@ViewData["ParentTitle"]</li>
-                            </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
-            </div>
-            <!-- /.content-header -->
-            <!-- Main content -->
-            <div class="content">
-                <div class="container-fluid">
-                    <partial name="_Notification" />
-                    @RenderBody()
-                </div>
-                <!-- /.container-fluid -->
-            </div>
-            <!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
-        <!-- Main Footer -->
-        <footer class="main-footer">
-            <strong>Copyright &copy; @DateTime.Now.Year.ToString() <a href="#">Wakaf Produktif Management, Jami Annawier Pekojan - Jakarta Barat</a>.</strong>
-            All rights reserved.
-            <div class="float-right d-none d-sm-inline-block">
-                <b>eUser Annawier</b> v6.00.01
-            </div>
-        </footer>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
     </div>
-    <!-- ./wrapper -->
-    <!-- REQUIRED SCRIPTS -->
-    <!-- jQuery -->
-    <script src="~/plugins/jquery/jquery.min.js"></script>
-    <script src="~/plugins/jquery/jquery.js"></script>
-    <!-- Bootstrap -->
-    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE -->
-    <script src="~/dist/js/adminlte.js"></script>
-    <!-- DataTables -->
-    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
-    <!-- InputMask -->
-    <script src="~/plugins/moment/moment.min.js"></script>
-    <script src="~/plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
-    <!-- Latest Select Picker -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-    <!-- Select2 -->
-    <script src="~/plugins/select2/js/select2.full.min.js"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="~/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- bootstrap datepicker -->
-    <script src="~/plugins/datepicker/bootstrap-datepicker.js"></script>
-    <!-- DataTables -->
-    <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 
-    <script>
-        $(function () {
-            //Initialize Select2 Elements
-            $('.select2').select2()
-        })
-    </script>
-
-    @RenderSection("Scripts", required: false)
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - AppointmentScheduling - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/lib/select2/js/select2.full.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/combine/npm/fullcalendar@5.5.1"></script>
+    <script src="https://kendo.cdn.telerik.com/2020.2.513/js/kendo.all.min.js"></script>
+    <script type="text/javascript" src="~/js/notify.min.js"></script>
+    <script src="~/js/script-custom-calendar.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

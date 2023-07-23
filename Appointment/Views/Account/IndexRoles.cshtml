@@ -1,0 +1,116 @@
+﻿@model X.PagedList.IPagedList<Appointment.ViewModels.RoleViewModel>
+@using X.PagedList.Mvc.Core
+
+<style>
+    th {
+        text-align: center;
+        font-size: small;
+    }
+
+    .table {
+        margin-top: 10px;
+    }
+</style>
+
+<form>
+    @Html.AntiForgeryToken()
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <center>
+                                    <h3>List Role</h3>
+                                </center>
+                            </div>
+                        </div>
+                        <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                        <div class="row">
+                            <div class="col-md-9">
+                                <a asp-action="CreateRole" class="btn btn-primary text-white">Create Role</a>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="Search" aria-label="Search" class="form-control form-control-sm" name="search" value="@ViewData["CurrentFilter"]" />
+                                    <div class="input-group-prepend">
+                                        <button type="submit" value="Search" class="btn btn-primary btn-sm" asp-action="Index" formmethod="get">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="tableList" class="table table-bordered table-hover">
+
+                                        <thead class="bg-gray-light">
+                                            <tr>
+                                                <th><a asp-action="IndexRoles" asp-route-sortOrder="@ViewData["RoleName"]" asp-route-search="@ViewData["CurrentFilter"]">Role Name</a></th>
+                                                <th><a href="#">Action</a></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.RoleName)</td>
+                                                    <td width="30%" align="center">
+                                                        <button type="submit" value="Edit" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="EditRoles" asp-route-id="@item.RoleId" formmethod="post">
+                                                            <i class="fas fa-edit"></i>&nbsp;
+                                                            Edit
+                                                        </button>
+                                                        <button type="submit" value="Delete" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="DeleteRoles" asp-route-id="@item.RoleId" formmethod="post">
+                                                            <i class="fas fa-edit"></i>&nbsp;
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                        @Html.PagedListPager(Model, page => Url.Action("IndexRoles", new { page, sortOrder = ViewBag.CurrentSort, search = ViewBag.CurrentFilter }),
+                        new X.PagedList.Web.Common.PagedListRenderOptions
+                        {
+                        LiElementClasses = new string[] { "page-item" },
+                        PageClasses = new string[] { "page-link" }
+                        })
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script>
+        $(function () {
+            $('#tableList').DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

@@ -1,4 +1,5 @@
 using Appointment.Models;
+using Appointment.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ builder.Services.AddDbContext<AppointmentContext>(options =>
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppointmentContext>();
-
+builder.Services.AddTransient<IAppointmentService, AppointmentService>();
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddMvc().AddSessionStateTempDataProvider();
