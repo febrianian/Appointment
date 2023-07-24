@@ -59,6 +59,7 @@
                                         <thead class="bg-gray-light">
                                             <tr>
                                                 <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Spesialis Name</a></th>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Status"]" asp-route-search="@ViewData["CurrentFilter"]">Status</a></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -68,6 +69,16 @@
                                                 <tr>
 
                                                     <td>@Html.DisplayFor(modelItem => item.SpesialisName)</td>
+                                                    <td>
+                                                        @if (item.Status == "A")
+                                                        {
+                                                            <button class="btn btn-block bg-success text-white">Active</button>
+                                                        }
+                                                        else if (item.Status == "N")
+                                                        {
+                                                            <button class="btn btn-block bg-danger text-white">Inactive</button>
+                                                        }
+                                                    </td>
                                                     <td width="30%" class="m-5">
                                                         <button type="submit" value="Edit" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="Edit" asp-route-id="@item.Id" formmethod="post">
                                                             <i class="fas fa-edit"></i>&nbsp;

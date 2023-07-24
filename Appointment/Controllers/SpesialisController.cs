@@ -3,6 +3,7 @@ using Appointment.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using X.PagedList;
 
@@ -26,6 +27,7 @@ namespace Appointment.Controllers
 
             ViewData["Id"] = String.IsNullOrEmpty(sortOrder) ? "uid_d" : "";
             ViewData["Name"] = sortOrder == "name_a" ? "name_d" : "name_a";
+            ViewData["Status"] = sortOrder == "status_a" ? "status_d" : "status_a";
 
             int pageSize = 10;
             int pageNumber = (page ?? 1);
@@ -33,7 +35,7 @@ namespace Appointment.Controllers
 
             IList<SpesialisViewModel> items = new List<SpesialisViewModel>();
 
-            var listUser = _context.Spesialis.ToList().Where( i => i.Status == "A");
+            var listUser = _context.Spesialis.ToList();
 
             if (!String.IsNullOrEmpty(search))
             {
@@ -47,10 +49,10 @@ namespace Appointment.Controllers
                 case "uid_d":
                     sortedItems = sortedItems.OrderByDescending(i => i.Id);
                     break;
-                case "usr_a":
+                case "name_a":
                     sortedItems = sortedItems.OrderBy(i => i.SpesialisName);
                     break;
-                case "usr_d":
+                case "name_d":
                     sortedItems = sortedItems.OrderByDescending(i => i.SpesialisName);
                     break;                
                 default:
@@ -65,6 +67,7 @@ namespace Appointment.Controllers
                 SpesialisViewModel item = new SpesialisViewModel();
                 item.Id = itemusr.Id;
                 item.SpesialisName = itemusr.SpesialisName;
+                item.Status = itemusr.Status;
 
                 items.Add(item);
             }
@@ -136,13 +139,17 @@ namespace Appointment.Controllers
             SpesialisViewModel vm = new SpesialisViewModel();
             vm.Id = data.Id;
             vm.SpesialisName = data.SpesialisName;
+            vm.Description = data.Description;
             vm.Status = data.Status;
             vm.ImagesPath = data.ImagesPath;
             vm.UserCreated = data.UserCreated;
             vm.DateCreated = data.DateCreated;
             vm.UserModified = data.UserModified;
             vm.DateModified = data.DateModified;
-
+            var status = new List<SelectListItem>();
+            status.Add(new SelectListItem { Text = "Active", Value = "A" });
+            status.Add(new SelectListItem { Text = "Inactive", Value = "N" });
+            ViewData["Status"] = new SelectList(status, "Value", "Text");
             return View(vm);
         }
 
@@ -156,9 +163,13 @@ namespace Appointment.Controllers
                 var data = edit.Single();
                 data.SpesialisName = model.SpesialisName.Trim();               
                 data.Description = model.Description;               
+                data.Status = model.Status;      
                 data.DateModified = DateTime.Now;
                 data.UserModified = User.Identity.Name;
-
+                var status = new List<SelectListItem>();
+                status.Add(new SelectListItem { Text = "Active", Value = "A" });
+                status.Add(new SelectListItem { Text = "Inactive", Value = "N" });
+                ViewData["Status"] = new SelectList(status, "Value", "Text", data.Status);
                 // Update the image path if a new image is uploaded
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
