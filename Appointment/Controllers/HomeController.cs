@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Appointment.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,6 +21,7 @@ namespace Appointment.Controllers
             _config = config;
         }
 
+        [Authorize(Roles = "Doctor, Patient, Admin")]
         public IActionResult Index()
         {
             var spesialis = _context.Spesialis.Where(i => i.Status == "A").ToList();
@@ -93,25 +94,11 @@ namespace Appointment.Controllers
                     }
                 }
             }
-        }
-
-        [AllowAnonymous]
-        public async Task<IActionResult> TestEmail()
-        {
-            string from = "BI";
-            string subject = "[INFO] Successfully Getting New Exchange Rate from BI (eSelling)";
-            string status = "Success";
-            await SentEmail(subject, status, from, true);
-            return View();
-        }
+        }        
 
         [AllowAnonymous]
         public async Task<IActionResult> PrivacyAsync()
         {
-            string from = "BI";
-            string subject = "[INFO] Successfully Getting New Exchange Rate from BI (eSelling)";
-            string status = "Success";
-            await SentEmail(subject, status, from, true);
             return View();
         }
 

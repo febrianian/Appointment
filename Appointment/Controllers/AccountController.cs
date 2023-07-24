@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 using MimeKit;
+using System;
 
 namespace Appointment.Controllers
 {
@@ -541,63 +542,53 @@ namespace Appointment.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ResetPassword(string userName)
+        public IActionResult ResetPasswordAdmin(string userName)
         {
-            ViewData["UserSetupParent"] = parent;
-            ViewData["ListUserActive"] = active;
-
             if (userName == null)
             {
                 return NotFound();
             }
 
             ViewData["UserName"] = userName;
+
             return View();
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> ResetPasswordSubmit(RegisterViewModel vm)
-        //{
-        //    ViewData["UserSetupParent"] = parent;
-        //    ViewData["ListUserActive"] = active;
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPasswordAdminPost(RegisterViewModel vm)
+        {
+            var userPassReset = await _userManager.FindByEmailAsync(vm.Email);
 
-        //    var userPassReset = await _userManager.FindByEmailAsync(vm.Email);
+            if (userPassReset != null)
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(userPassReset);
 
-        //    if (userPassReset != null)
-        //    {
-        //        var token = await _userManager.GeneratePasswordResetTokenAsync(userPassReset);
+                var result = await _userManager.ResetPasswordAsync(userPassReset, token, vm.Password);
 
-        //        var result = await _userManager.ResetPasswordAsync(userPassReset, token, vm.Password);
+                if (result.Succeeded)
+                {
+                    var email = vm.Email;
+                    return RedirectToAction("ResetPasswordSuccessAdmin", "Account", email);
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View("ResetPasswordAdmin", vm);
+                }
+            }
 
-        //        if (result.Succeeded)
-        //        {
-        //            var Email = vm.Email;
-        //            return RedirectToAction("ResetPasswordSuccess", "Account", Email);
-        //        }
-        //        else
-        //        {
-        //            foreach (var error in result.Errors)
-        //            {
-        //                ModelState.AddModelError("", error.Description);
-        //            }
-        //            return View(vm);
-        //        }
-        //    }
+            return View("ResetPasswordAdmin", vm);
+        }
 
-        //    return View(vm);
-        //}
-
-        //public IActionResult ResetPasswordSuccess(string Email)
-        //{
-        //    ViewData["Email"] = Email;
-        //    return View();
-        //}
-        //public async Task<IActionResult> SuccessfulChangePassword()
-        //{
-        //    await _singInManager.SignOutAsync();
-        //    return View();
-        //}
+        public IActionResult ResetPasswordSuccessAdmin(string email)
+        {
+            ViewData["Email"] = email;
+            return View();
+        }
 
         public IActionResult IndexRoles(string sortOrder, string search, int? page)
         {
