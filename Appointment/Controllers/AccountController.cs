@@ -130,12 +130,13 @@ namespace Appointment.Controllers
             ViewData["ListUserActive"] = active;
 
             using (var transSql = _context.Database.BeginTransaction())
-            {                
+            {
                 var user = new ApplicationUser
                 {
                     UserName = rgvm.Email,
                     Email = rgvm.Email,
-                    Name = rgvm.Name                    
+                    Name = rgvm.Name,
+                    UserCreated = User.Identity.Name
                 };
 
                 if (ModelState.IsValid)
@@ -343,7 +344,7 @@ namespace Appointment.Controllers
 
 
         [AllowAnonymous]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogOff()
         {
             try
             {

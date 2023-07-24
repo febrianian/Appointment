@@ -33,11 +33,20 @@ namespace Appointment.Utility
                 };            
         }
 
+        public static List<SelectListItem> GetRolesForDropDownPublic()
+        {
+            return new List<SelectListItem>
+                {
+                    new SelectListItem{Value=Helper.Patient,Text=Helper.Patient},
+                    new SelectListItem{Value=Helper.Doctor,Text=Helper.Doctor}
+                };
+        }
+
         public static List<SelectListItem> GetTimeDropDown()
         {
             int minute = 60;
             List<SelectListItem> duration = new List<SelectListItem>();
-            for (int i = 1; i <= 12; i++)
+            for (int i = 1; i <= 24; i++)
             {
                 duration.Add(new SelectListItem { Value = minute.ToString(), Text = i + " Hr" });
                 minute = minute + 30;

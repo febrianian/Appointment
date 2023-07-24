@@ -1,0 +1,33 @@
+﻿@model Appointment.ViewModels.RoleViewModel
+
+@{
+    ViewData["ParentTitle"] = "List Roles";
+    ViewData["Title"] = "Edit Roles";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="RoleId" type="hidden" />
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h3>Edit Roles</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="RoleName" class="control-label"></label>
+                        <input asp-for="RoleName" class="form-control" />
+                        <span asp-validation-for="RoleName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary text-white float-right" asp-controller="Account" asp-action="PostEditRoles" asp-route-id="@Model.RoleId" />
+                        <a asp-controller="Account" asp-action="IndexRoles" class="btn btn-primary text-white">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,84 @@
+﻿@model Appointment.ViewModels.SpesialisViewModel
+
+<form method="post"enctype="multipart/form-data">
+    <h4>Register Spesialis</h4>
+    <hr />
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="SpesialisName">Spesialis Name</label>
+        <div class=" col-md-10">
+            <input asp-for="SpesialisName" class="form-control" />
+            <span asp-validation-for="SpesialisName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="ImagesPath"></label>
+        <div class=" col-md-5">
+            <img src="@Model.ImagesPath"  width="50%" style="border-radius:5px;border: 1px solid #bbb9b9;" />
+            <span asp-validation-for="SpesialisName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="ImagesPath">Image</label>
+        <div class=" col-md-10">
+            <input type="file" name="ImageFile" multiple class="form-control" />
+            <span asp-validation-for="SpesialisName" class="text-danger"></span>
+        </div> 
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="Description">Description</label>
+        <div class=" col-md-10">
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="Status">Status</label>
+        <div class=" col-md-10">
+            <input asp-for="Status" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserCreated">User Created</label>
+        <div class=" col-md-10">
+            <input asp-for="UserCreated" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="DateCreated">Date Created</label>
+        <div class=" col-md-10">
+            <input asp-for="DateCreated" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserModified">User Modified</label>
+        <div class=" col-md-10">
+            <input asp-for="UserModified" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="DateModified">Date Modified</label>
+        <div class=" col-md-10">
+            <input asp-for="DateModified" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2">Action</label>
+        <div class="col-md-4">
+            <a asp-controller="Spesialis" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+        </div>
+        <div class="col-md-3">
+            <input type="submit" value="Edit" class="btn btn-primary form-control text-white" asp-controller="Spesialis" asp-action="PostEdit" asp-route-id="@Model.Id" />
+        </div>
+        <div class="col-md-3">
+            <input type="submit" value="Delete" class="btn btn-danger form-control text-white" asp-controller="Spesialis" asp-action="PostDelete" asp-route-id="@Model.Id" />
+        </div>               
+    </div>
+    <hr />   
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+}

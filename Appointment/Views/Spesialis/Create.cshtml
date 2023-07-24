@@ -1,0 +1,43 @@
+﻿@model Appointment.ViewModels.SpesialisViewModel
+
+<form method="post" enctype="multipart/form-data" asp-action="PostCreate" asp-controller="Spesialis">
+    <h4>Register Spesialis</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="SpesialisName">Spesialis Name</label>
+        <div class=" col-md-10">
+            <input asp-for="SpesialisName" class="form-control" />
+            <span asp-validation-for="SpesialisName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="SpesialisName">Image</label>
+        <div class=" col-md-10">
+            <input type="file" name="ImageFile" />
+            <span asp-validation-for="SpesialisName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="Description">Descripttion</label>
+        <div class=" col-md-10">
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2">Action</label>
+        <div class="col-md-5">
+            <a asp-controller="Spesialis" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+        </div>
+        <div class="col-md-5">
+            <input type="submit" value="Save" class="btn btn-primary form-control text-white"/>
+            @*<input type="submit" value="Save" class="btn btn-success" />*@
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+}

@@ -22,7 +22,7 @@
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="form-group">
+              @*  <div class="form-group">
 
                     <div class=" col-md-10 offset-md-2 checkbox">
                         <label asp-for="RememberMe" class="pr-4 pl-0">
@@ -30,16 +30,12 @@
                         </label>
                         Remember me?
                     </div>
-                </div>
+                </div>*@
                 <div class="form-group">
                     <div class="col-md-10 offset-md-2">
-                        <input type="submit" value="Log in" class="btn btn-success" />
+                        <input type="submit" value="Log in" class="btn btn-success" /> or <a asp-action="Register">Sign Up</a>
                     </div>
-                </div>
-                <p class="col-md-10 offset-md-2">
-                    <a asp-action="Register">Sign Up</a>
-                </p>
-
+                </div>               
             </form>
         </section>
     </div>

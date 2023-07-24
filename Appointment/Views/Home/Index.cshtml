@@ -6,3 +6,104 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+<br />
+@if (User.IsInRole("Admin"))
+{
+    <div class="card">
+        <div class="card-body">
+            <h4>User Setup</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <h5 class="card-header">Authorized</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">Registration Roles</h5>
+                            <p class="card-text">Menu untuk menambahkan Roles Baru</p>
+                            <a asp-controller="Account" asp-action="IndexRoles" class="btn btn-primary">Register</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <h5 class="card-header">Registration</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">Registration User</h5>
+                            <p class="card-text">Menu untuk menambahkan User Baru</p>
+                            <a asp-controller="Account" asp-action="Index" class="btn btn-primary">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="card">
+        <div class="card-body">
+            <h4>Doctor Setup</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <h5 class="card-header">Spesialis</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">Spesialis</h5>
+                            <p class="card-text">Daftar Spesialis Doctor</p>
+                            <a asp-controller="Spesialis" asp-action="Index" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <h5 class="card-header">Schedule</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">Time & Schedule Spesialis</h5>
+                            <p class="card-text">Daftar schedule untuk setiap spesialis</p>
+                            <a asp-controller="SpesialisSchedule" asp-action="Index" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <h5 class="card-header">Appointment</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">Doctor Appointment</h5>
+                            <p class="card-text">Daftar Appointment Doctor dan Patient</p>
+                            <a asp-controller="Appointment" asp-action="Index" class="btn btn-primary">Go</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+}
+
+
+<div class="card">
+    <div class="col-lg-12">
+        <div class="card-body">
+            <h4>Dokter Available</h4>
+            <hr>
+            <div class="card-container d-flex flex-row flex-wrap">
+                @foreach (var data in ViewBag.DataSpesialis)
+                {
+                    <div class="card col-md-6 mb-3 p-1">
+                        <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img src="@data.ImagesPath" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;" />
+                                </div>
+                                <div class="col-md-8">
+                                    <p class="card-text">@data.Description</p>
+                                    <a asp-controller="Account" asp-action="IndexRoles">Make Appointment</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

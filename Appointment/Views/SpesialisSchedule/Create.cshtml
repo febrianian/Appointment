@@ -1,0 +1,91 @@
+﻿@model Appointment.ViewModels.SpesialisScheduleViewModel
+
+
+<style>
+    .custom-radio-btn {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 8px 20px;
+  cursor: pointer;
+}
+
+.custom-radio-btn.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Hiding the default radio buttons */
+.custom-radio-btn input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+</style>
+
+<div class="btn" data-toggle="buttons">
+    <label class="btn btn-secondary custom-radio-btn">
+        <input type="radio" name="options" id="option1" autocomplete="off"> Option 1
+    </label>
+    <label class="btn btn-secondary custom-radio-btn">
+        <input type="radio" name="options" id="option2" autocomplete="off"> Option 2
+    </label>
+    <label class="btn btn-secondary custom-radio-btn">
+        <input type="radio" name="options" id="option3" autocomplete="off"> Option 3
+    </label>
+</div>
+
+<form method="post" asp-action="PostCreate" asp-controller="SpesialisSchedule">
+    <h4>Schedule Spesialis</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="IdSpesialis">Spesialis Name</label>
+        <div class=" col-md-10">
+            <select asp-for="IdSpesialis" asp-items="ViewBag.Spesialist" class="form-control text-sm select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"></select>
+            <span asp-validation-for="IdSpesialis" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserId">Doctor Name</label>
+        <div class=" col-md-10">
+            @Html.DropDownList("doctorId", new SelectList(ViewBag.DoctorList, "Id", "Name"), new
+                    {
+                        @class = "form-control select2"
+                    })
+            <span asp-validation-for="UserId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserId">Hari</label>
+        <div class=" col-md-10">
+            <select asp-for="ScheduleDay" asp-items="ViewBag.DayList" class="form-control text-sm select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"></select>
+            <span asp-validation-for="UserId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserId">Jam</label>
+        <div class=" col-md-5">
+            <select asp-for="StartDate" asp-items="ViewBag.Hours" class="form-control text-sm select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"></select>
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class=" col-md-5">
+            <select asp-for="EndDate" asp-items="ViewBag.Hours" class="form-control text-sm select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"></select>
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2">Action</label>
+        <div class="col-md-5">
+            <a asp-controller="Spesialis" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+        </div>
+        <div class="col-md-5">
+            <input type="submit" value="Save" class="btn btn-primary form-control text-white"/>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+        <partial name="_ValidationScriptsPartial" />
+
+}

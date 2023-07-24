@@ -1,0 +1,86 @@
+﻿@model Appointment.ViewModels.RegisterViewModel
+
+<div class="container">
+    <div class="card mt-5">
+        <div class="card-header text-center">
+            <h2>Details User</h2>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label asp-for="Name" class="col-form-label"></label>
+                        </div>
+                        <div class="col-md-10">
+                            <input asp-for="Name" readonly="readonly" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label asp-for="Email" class="col-form-label"></label>
+                        </div>
+                        <div class="col-md-10">
+                            <input asp-for="Email" readonly="readonly" class="form-control" />
+                        </div>
+                    </div>                    
+                </div>                
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="form-group row">
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <button id="btnYes" class="btn btn-primary form-control">Delete</button>
+                        </div>
+                        <div class="col-md-5">
+                            <a asp-action="Index" class="btn btn-primary form-control">Back to List</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*MODAL POPUP*@
+        <div class="modal fade" id="deleteuser">
+            <div class="modal-dialog modal-danger">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close fa fa-remove" data-dismiss="modal"></button>
+                        <h4 class="modal-title">Confirm Delete?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <p>Are You Sure?</p>
+                            <p>WARNING: THIS ACTION CANNOT BE UN-DONE!</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post">
+                            <input type="hidden" asp-for="Email" />
+                            @* <input type="submit" value="Yes" class="btn btn-outline btn-danger" />*@
+                            <input type="submit" value="Yes" class="btn btn-primary text-white" asp-controller="Account" asp-action="DeleteUser" asp-route-userName="@Model.Email" />
+                            @*<input type="submit" asp-route-userName="@Model.Email" class="btn btn-primary" value="Yes" />*@
+                            <button type="button" class="btn btn-outline btn-primary" id="btnNo">No</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnYes").click(function () {
+                $("#deleteuser").modal('show');
+            });
+            $("#btnNo").click(function () {
+                $("#deleteuser").modal('hide');
+            });
+        });
+    </script>
+}

@@ -3,6 +3,7 @@ using System;
 using Appointment.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Appointment.Migrations
 {
     [DbContext(typeof(AppointmentContext))]
-    partial class AppointmentContextModelSnapshot : ModelSnapshot
+    [Migration("20230723132216_AddScheduleSpesialis")]
+    partial class AddScheduleSpesialis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,12 +142,6 @@ namespace Appointment.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ImagesPath")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("SpesialisName")
                         .HasColumnType("longtext");
 
@@ -164,8 +161,7 @@ namespace Appointment.Migrations
 
             modelBuilder.Entity("Appointment.Models.SpesialisSchedule", b =>
                 {
-                    b.Property<int>("IdSpesialisSchedule")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateCreated")
@@ -177,7 +173,7 @@ namespace Appointment.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("IdSpesialis")
+                    b.Property<int>("IdSpesialisSchedule")
                         .HasColumnType("int");
 
                     b.Property<string>("ScheduleDay")
@@ -192,15 +188,10 @@ namespace Appointment.Migrations
                     b.Property<string>("UserCreated")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("UserModified")
                         .HasColumnType("longtext");
 
-                    b.HasKey("IdSpesialisSchedule");
-
-                    b.HasIndex("IdSpesialis");
+                    b.HasKey("Id");
 
                     b.ToTable("SpesialisSchedule");
                 });
@@ -337,7 +328,7 @@ namespace Appointment.Migrations
                 {
                     b.HasOne("Appointment.Models.Spesialis", "Spesialis")
                         .WithMany()
-                        .HasForeignKey("IdSpesialis")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -1,0 +1,60 @@
+﻿@model Appointment.ViewModels.AddRoleViewModel
+
+@{
+    ViewData["ParentTitle"] = "List Roles";
+    ViewData["Title"] = "Add Roles";
+}
+
+<form method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Add Roles For @Model.Name <span class="text-danger">@ViewBag.ErrorAddRoles</span></h3>
+                    </div>
+                    <div class="card-body">
+                        <input asp-for="UserId" type="hidden" class="form-control" />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group">
+                            <select asp-for="NewRole" asp-items="Model.Roles" class="form-control"></select>
+                            <span class="text-danger" asp-validation-for="NewRole"></span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="form-group">
+                                <input type="submit" asp-controller="Account" asp-action="AddRole" value="Add Role" class="btn btn-primary float-right" />
+                                <button type="submit" asp-action="IndexUser" asp-controller="Account" class="btn btn-primary float-left">Back to List</button>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="form-group">
+                            <table class="table table-bordered table-hover">
+                                <thead class="bg-gray-light">
+                                    <tr>
+                                        <th>Role Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.RoleListUser)
+                                    {
+                                        <tr>
+                                            <td>@Html.DisplayFor(modelItem => item.RoleName)</td>
+                                            <td>
+                                                <button type="submit" value="Delete" class="btn btn-primary btn-link text-white" style="text-align:center" asp-controller="Account" asp-action="RemoveUserRole" asp-route-userId="@item.UserId" asp-route-roleId="@item.RoleId">
+                                                    <i class="fas fa-edit"></i>&nbsp;
+                                                    Delete Roles
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

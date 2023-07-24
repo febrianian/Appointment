@@ -1,0 +1,72 @@
+﻿@model Appointment.ViewModels.RegisterViewModel
+
+<form method="post">
+    <div class="container"> 
+        <div class="card row mt-5">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Email" />
+            <div class="card-header text-center col-12 px-3">
+                <h2 class="p-2 pb-4">Edit Your Account @ViewBag.MyUser</h2>
+            </div>
+            <div class="card-body col-12 pt-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label asp-for="Name"></label>
+                            </div>
+                            <div class="col-md-12">
+                                <input class="form-control" asp-for="Name" />
+                                <span class="text-danger" asp-validation-for="Name"></span>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label asp-for="Email"></label>
+                            </div>
+                            <div class="col-md-12">
+                                <input class="form-control" asp-for="Email" />
+                                <span class="text-danger" asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+                    </div>                    
+                        @*<div class="form-group">
+                            <label asp-for="ProfPics" class="control-label"></label>
+                            <div class="custom-file">
+                                <input asp-for="ProfPics" class="custom-file-input form-control" id="customFile">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+                            <span asp-validation-for="ProfPics" class="text-danger"></span>
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="form-group row">
+                    <div class="col-md-9 offset-1">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="submit" value="Update" class="btn btn-primary text-white form-control" asp-controller="Account" asp-action="EditUser" asp-route-userName="@Model.Email" />
+                            </div>
+                            <div class="col-md-6">
+                                <a asp-controller="Account" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+<script type="text/javascript">
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+    <partial name="_ValidationScriptsPartial" />
+}
+

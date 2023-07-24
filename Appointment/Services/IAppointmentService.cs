@@ -10,6 +10,7 @@ namespace Appointment.Services
     {
         public List<DoctorVM> GetDoctorList();
         public List<PatientVM> GetPatientList();
+        public List<SpesialisViewModel> GetSpesialistList();
         public Task<int> AddUpdate(AppointmentVM model);
 
         public List<AppointmentVM> DoctorsEventsById(string doctorId);

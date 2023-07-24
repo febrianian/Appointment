@@ -3,6 +3,7 @@ using System;
 using Appointment.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Appointment.Migrations
 {
     [DbContext(typeof(AppointmentContext))]
-    partial class AppointmentContextModelSnapshot : ModelSnapshot
+    [Migration("20230723145411_removeSchedule")]
+    partial class removeSchedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,12 +142,6 @@ namespace Appointment.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ImagesPath")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("SpesialisName")
                         .HasColumnType("longtext");
 
@@ -160,49 +157,6 @@ namespace Appointment.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Spesialis");
-                });
-
-            modelBuilder.Entity("Appointment.Models.SpesialisSchedule", b =>
-                {
-                    b.Property<int>("IdSpesialisSchedule")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("IdSpesialis")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ScheduleDay")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserCreated")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UserModified")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("IdSpesialisSchedule");
-
-                    b.HasIndex("IdSpesialis");
-
-                    b.ToTable("SpesialisSchedule");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -331,17 +285,6 @@ namespace Appointment.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Appointment.Models.SpesialisSchedule", b =>
-                {
-                    b.HasOne("Appointment.Models.Spesialis", "Spesialis")
-                        .WithMany()
-                        .HasForeignKey("IdSpesialis")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Spesialis");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

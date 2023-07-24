@@ -25,23 +25,24 @@ namespace Appointment.Services
             if (model != null && model.IdAppointment > 0)
             {
                 //update
-                var appointment = _db.AppointmentClinic.FirstOrDefault(x => x.IdAppointment == model.IdAppointment);
-                appointment.Title = model.Title;
-                appointment.Description = model.Description;
-                appointment.StartDate = startDate;
-                appointment.EndDate = endDate;
-                appointment.Duration = model.Duration;
-                appointment.DoctorId = model.DoctorId;
-                appointment.PatientId = model.PatientId;
-                appointment.IsDoctorApproved = false;
-                appointment.AdminId = model.AdminId;
+                var appointmentUpdate = _db.AppointmentClinic.FirstOrDefault(x => x.IdAppointment == model.IdAppointment);
+                appointmentUpdate.Title = model.Title;
+                appointmentUpdate.Description = model.Description;
+                appointmentUpdate.StartDate = startDate;
+                appointmentUpdate.EndDate = endDate;
+                appointmentUpdate.Duration = model.Duration;
+                appointmentUpdate.DoctorId = model.DoctorId;
+                appointmentUpdate.PatientId = model.PatientId;
+                appointmentUpdate.IsDoctorApproved = false;
+                appointmentUpdate.AdminId = model.AdminId;
+                _db.AppointmentClinic.Update(appointmentUpdate);
                 await _db.SaveChangesAsync();
                 return 1;
             }
             else
             {
                 //create
-                AppointmentClinic appointment = new AppointmentClinic()
+                AppointmentClinic appointmentNew = new AppointmentClinic()
                 {
                     Title = model.Title,
                     Description = model.Description,
@@ -51,13 +52,13 @@ namespace Appointment.Services
                     DoctorId = model.DoctorId,
                     PatientId = model.PatientId,
                     IsDoctorApproved = false,
-                    AdminId = model.AdminId
+                    AdminId = "A"
                 };
                 //await _emailSender.SendEmailAsync(doctor.Email, "Appointment Created",
                 //    $"Your appointment with {patient.Name} is created and in pending status");
                 //await _emailSender.SendEmailAsync(patient.Email, "Appointment Created",
                 //    $"Your appointment with {doctor.Name} is created and in pending status");
-                _db.AppointmentClinic.Add(appointment);
+                _db.AppointmentClinic.Add(appointmentNew);
                 await _db.SaveChangesAsync();
                 return 2;
             }
@@ -122,7 +123,8 @@ namespace Appointment.Services
         {
             var doctors = (from user in _db.Users
                            join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
-                           join roles in _db.Roles.Where(x => x.Name == Helper.Doctor) on userRoles.RoleId equals roles.Id
+                           join roles in _db.Roles on userRoles.RoleId equals roles.Id
+                           where roles.Name == "Doctor"
                            select new DoctorVM
                            {
                                Id = user.Id,
@@ -146,6 +148,20 @@ namespace Appointment.Services
                            ).ToList();
 
             return patients;
+        }
+
+        public List<SpesialisViewModel> GetSpesialistList()
+        {
+            var spesialis = (from spesial in _db.Spesialis
+                             where spesial.Status == "A"
+                             select new SpesialisViewModel
+                             {
+                                 Id = spesial.Id,
+                                 SpesialisName = spesial.SpesialisName
+                             }
+                           ).ToList();
+
+            return spesialis;
         }
 
         public List<AppointmentVM> PatientsEventsById(string patientId)
