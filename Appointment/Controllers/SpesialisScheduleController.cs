@@ -24,7 +24,9 @@ namespace Appointment.Controllers
 
             ViewData["Id"] = String.IsNullOrEmpty(sortOrder) ? "uid_d" : "";
             ViewData["Name"] = sortOrder == "name_a" ? "name_d" : "name_a";
-            ViewData["Day"] = sortOrder == "name_a" ? "name_d" : "name_a";
+            ViewData["Spesialis"] = sortOrder == "spesialis_a" ? "spesialis_d" : "spesialis_a";
+            ViewData["Status"] = sortOrder == "status_a" ? "status_d" : "status_a";
+            ViewData["Day"] = sortOrder == "day_a" ? "day_d" : "day_a";
 
             int pageSize = 10;
             int pageNumber = (page ?? 1);
@@ -34,11 +36,13 @@ namespace Appointment.Controllers
 
             var schedule = from sche in _context.SpesialisSchedule
                            join spes in _context.Spesialis on sche.IdSpesialis equals spes.Id
-                           where sche.Status == "A"
+                           join user in _context.Users on sche.UserId equals user.Id                           
                            select new
                            {
                                sche.IdSpesialisSchedule,
                                spes.SpesialisName,
+                               sche.Status,
+                               user.Name,
                                sche.ScheduleDay,
                                sche.StartDate,
                                sche.EndDate
@@ -57,10 +61,28 @@ namespace Appointment.Controllers
                 case "uid_d":
                     sortedItems = sortedItems.OrderByDescending(i => i.IdSpesialisSchedule);
                     break;
-                case "usr_a":
+                case "name_a":
+                    sortedItems = sortedItems.OrderBy(i => i.Name);
+                    break;
+                case "name_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.Name);
+                    break;
+                case "spesialis_a":
+                    sortedItems = sortedItems.OrderBy(i => i.SpesialisName);
+                    break;
+                case "spesialis_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.SpesialisName);
+                    break;
+                case "status_a":
+                    sortedItems = sortedItems.OrderBy(i => i.Status);
+                    break;
+                case "status_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.Status);
+                    break;
+                case "day_a":
                     sortedItems = sortedItems.OrderBy(i => i.ScheduleDay);
                     break;
-                case "usr_d":
+                case "day_d":
                     sortedItems = sortedItems.OrderByDescending(i => i.ScheduleDay);
                     break;
                 default:
@@ -74,6 +96,8 @@ namespace Appointment.Controllers
             {
                 SpesialisScheduleViewModel item = new SpesialisScheduleViewModel();
                 item.IdSpesialisSchedule = itemusr.IdSpesialisSchedule;
+                item.Name = itemusr.Name;
+                item.Status = itemusr.Status;
                 item.SpesialisName = itemusr.SpesialisName;
                 item.ScheduleDay = itemusr.ScheduleDay;
                 item.StartDate = itemusr.StartDate.ToString("HH:mm");
@@ -87,9 +111,7 @@ namespace Appointment.Controllers
         }
 
         public async Task<IActionResult> Create()
-        {
-            ViewBag.DoctorList = _appointmentService.GetDoctorList();
-
+        {            
             var spesialis =
                   _context.Spesialis
                   .Where(i => i.Status == "A")
@@ -100,6 +122,27 @@ namespace Appointment.Controllers
                   });
 
             ViewData["Spesialist"] = new SelectList(spesialis, "Id", "SpesialisName");
+            
+            var doctors = (from user in _context.Users
+                           join userRoles in _context.UserRoles on user.Id equals userRoles.UserId
+                           join roles in _context.Roles on userRoles.RoleId equals roles.Id
+                           where roles.Name == "Doctor"
+                           select new DoctorVM
+                           {
+                               Id = user.Id,
+                               Name = user.Name
+                           }
+                           ).ToList();
+
+            var doctor = doctors
+                          .Select(t => new
+                          {
+                              Id = t.Id,
+                              Name = t.Name
+                          });
+
+
+            ViewData["DoctorList"] = new SelectList(doctor, "Id", "Name");
 
             var dayList = new List<SelectListItem>();
             dayList.Add(new SelectListItem { Text = "Senin", Value = "Senin" });
@@ -133,7 +176,7 @@ namespace Appointment.Controllers
             string startDate = model.StartDate;
             DateTime startDateModify = DateTime.ParseExact(startDate, "H:mm", null);
             DateTime updatedStartDate = new DateTime(startDateModify.Year, startDateModify.Month, startDateModify.Day, startDateModify.Hour, 0, 0);
-            string endDate = model.StartDate;
+            string endDate = model.EndDate;
             DateTime endDateModify = DateTime.ParseExact(endDate, "H:mm", null);
             DateTime updatedEndDate = new DateTime(endDateModify.Year, endDateModify.Month, endDateModify.Day, endDateModify.Hour, 0, 0);
 
@@ -154,29 +197,93 @@ namespace Appointment.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id)
         {
-            var data = _context.Spesialis.Where(i => i.Id == id).Single();
+            var data = _context.SpesialisSchedule.Where(i => i.IdSpesialisSchedule == id).Single();
 
-            SpesialisViewModel vm = new SpesialisViewModel();
-            vm.Id = data.Id;
-            vm.SpesialisName = data.SpesialisName;
+            SpesialisScheduleViewModel vm = new SpesialisScheduleViewModel();
+            vm.IdSpesialisSchedule = data.IdSpesialisSchedule;
             vm.Status = data.Status;
             vm.UserCreated = data.UserCreated;
             vm.DateCreated = data.DateCreated;
             vm.UserModified = data.UserModified;
             vm.DateModified = data.DateModified;
 
+            var spesialis =
+                  _context.Spesialis
+                  .Where(i => i.Status == "A")
+                  .Select(t => new
+                  {
+                      Id = t.Id,
+                      SpesialisName = t.SpesialisName
+                  });
+
+            ViewData["Spesialist"] = new SelectList(spesialis, "Id", "SpesialisName", data.IdSpesialis);
+
+            var doctors = (from user in _context.Users
+                           join userRoles in _context.UserRoles on user.Id equals userRoles.UserId
+                           join roles in _context.Roles on userRoles.RoleId equals roles.Id
+                           where roles.Name == "Doctor"
+                           select new DoctorVM
+                           {
+                               Id = user.Id,
+                               Name = user.Name
+                           }
+                           ).ToList();
+
+            var doctor = doctors
+                          .Select(t => new
+                          {
+                              Id = t.Id,
+                              Name = t.Name
+                          });
+
+            ViewData["DoctorList"] = new SelectList(doctor, "Id", "Name", data.UserId);
+
+            var dayList = new List<SelectListItem>();
+            dayList.Add(new SelectListItem { Text = "Senin", Value = "Senin" });
+            dayList.Add(new SelectListItem { Text = "Selasa", Value = "Selasa" });
+            dayList.Add(new SelectListItem { Text = "Rabu", Value = "Rabu" });
+            dayList.Add(new SelectListItem { Text = "Kamis", Value = "Kamis" });
+            dayList.Add(new SelectListItem { Text = "Jumat", Value = "Jumat" });
+            dayList.Add(new SelectListItem { Text = "Sabtu", Value = "Sabtu" });
+            dayList.Add(new SelectListItem { Text = "Minggu", Value = "Minggu" });
+            ViewData["DayList"] = new SelectList(dayList, "Value", "Text", data.ScheduleDay);
+
+            int minute = 60;
+            List<SelectListItem> duration = new List<SelectListItem>();
+
+            for (int i = 1; i <= 24; i++)
+            {
+                duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":00" });
+                minute = minute + 30;
+                duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
+                minute = minute + 30;
+            }
+
+            ViewData["Hours1"] = new SelectList(duration, "Value", "Text", data.StartDate);
+            ViewData["Hours2"] = new SelectList(duration, "Value", "Text", data.EndDate);
+
             return View(vm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostEdit(SpesialisViewModel model)
+        public async Task<IActionResult> PostEdit(SpesialisScheduleViewModel model)
         {
-            var edit = _context.Spesialis.Where(i => i.Id == model.Id);
+            var edit = _context.SpesialisSchedule.Where(i => i.IdSpesialisSchedule == model.IdSpesialisSchedule);
+
+            string startDate = model.StartDate;
+            DateTime startDateModify = DateTime.ParseExact(startDate, "H:mm", null);
+            DateTime updatedStartDate = new DateTime(startDateModify.Year, startDateModify.Month, startDateModify.Day, startDateModify.Hour, 0, 0);
+            string endDate = model.EndDate;
+            DateTime endDateModify = DateTime.ParseExact(endDate, "H:mm", null);
+            DateTime updatedEndDate = new DateTime(endDateModify.Year, endDateModify.Month, endDateModify.Day, endDateModify.Hour, 0, 0);
 
             if (edit.Count() > 0)
             {
                 var data = edit.Single();
-                data.SpesialisName = model.SpesialisName.Trim();
+                data.IdSpesialis = model.IdSpesialis;
+                data.UserId = model.UserId;
+                data.StartDate = updatedStartDate;
+                data.EndDate = updatedEndDate;
                 data.DateModified = DateTime.Now;
                 data.UserModified = User.Identity.Name;
                 _context.Update(data);
@@ -188,9 +295,9 @@ namespace Appointment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostDelete(SpesialisViewModel model)
+        public async Task<IActionResult> PostDelete(SpesialisScheduleViewModel model)
         {
-            var edit = _context.Spesialis.Where(i => i.Id == model.Id);
+            var edit = _context.SpesialisSchedule.Where(i => i.IdSpesialisSchedule == model.IdSpesialisSchedule);
 
             if (edit.Count() > 0)
             {

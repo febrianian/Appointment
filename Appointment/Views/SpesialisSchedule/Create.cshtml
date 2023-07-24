@@ -49,10 +49,7 @@
     <div class="form-group row">
         <label class="col-md-2" asp-for="UserId">Doctor Name</label>
         <div class=" col-md-10">
-            @Html.DropDownList("doctorId", new SelectList(ViewBag.DoctorList, "Id", "Name"), new
-                    {
-                        @class = "form-control select2"
-                    })
+            <select asp-for="UserId" asp-items="ViewBag.DoctorList" class="form-control text-sm select2 select2-danger" data-dropdown-css-class="select2-danger" style="width: 100%;"></select>
             <span asp-validation-for="UserId" class="text-danger"></span>
         </div>
     </div>
@@ -77,7 +74,7 @@
     <div class="form-group row">
         <label class="col-md-2">Action</label>
         <div class="col-md-5">
-            <a asp-controller="Spesialis" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+            <a asp-controller="SpesialisShcedule" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
         </div>
         <div class="col-md-5">
             <input type="submit" value="Save" class="btn btn-primary form-control text-white"/>

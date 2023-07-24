@@ -9,6 +9,7 @@ namespace Appointment.ViewModels
         public int IdSpesialis { get; set; }
         public string SpesialisName { get; set; }
         public string UserId { get; set; }
+        public string Name { get; set; }
         public string ScheduleDay { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }

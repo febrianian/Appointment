@@ -57,10 +57,12 @@
                                     <table id="tableList" class="table table-bordered table-hover">
                                         <thead class="bg-gray-light">
                                             <tr>
-                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Spesialis Name</a></th>
-                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Day</a></th>
-                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Time 1</a></th>
-                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Time 2</a></th>
+                                               <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Name</a></th>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Spesialis"]" asp-route-search="@ViewData["CurrentFilter"]">Spesialis Name</a></th>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Day"]" asp-route-search="@ViewData["CurrentFilter"]">Day</a></th>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Status"]" asp-route-search="@ViewData["CurrentFilter"]">Status</a></th>
+                                                <th><a asp-action="Index" asp-route-search="@ViewData["CurrentFilter"]">Time 1</a></th>
+                                                <th><a asp-action="Index" asp-route-search="@ViewData["CurrentFilter"]">Time 2</a></th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -68,8 +70,19 @@
                                             @foreach (var item in Model)
                                             {
                                                 <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
                                                     <td>@Html.DisplayFor(modelItem => item.SpesialisName)</td>
                                                     <td>@Html.DisplayFor(modelItem => item.ScheduleDay)</td>
+                                                    <td>
+                                                        @if (item.Status == "A")
+                                                        {
+                                                            <button class="btn btn-block bg-success text-white">Active</button>
+                                                        }
+                                                        else if (item.Status == "N")
+                                                        {
+                                                            <button class="btn btn-block bg-danger text-white">Inactive</button>
+                                                        }
+                                                    </td>
                                                     <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
                                                     <td>@Html.DisplayFor(modelItem => item.EndDate)</td>
                                                     <td width="30%" class="m-5">
