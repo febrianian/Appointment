@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using X.PagedList;
-using Appointment.ViewModels;
+using MimeKit;
 
 namespace Appointment.Controllers
 {
@@ -18,18 +18,134 @@ namespace Appointment.Controllers
         private readonly SignInManager<ApplicationUser> _singInManager;
         private readonly IWebHostEnvironment _webEnvirontment;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _config;
         private string active = "active";
         private string parent = "menu-open";
 
-        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, AppointmentContext context, IWebHostEnvironment webEnvirontment)
+        public AccountController(UserManager<ApplicationUser> userManager,IConfiguration config, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, AppointmentContext context, IWebHostEnvironment webEnvirontment)
         {
             _context = context;
             _userManager = userManager;
             _singInManager = signInManager;
             _webEnvirontment = webEnvirontment;
             _roleManager = roleManager;
+            _config = config;
         }
 
+        public async Task SentEmail(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress)
+        {
+            //send Email Here
+            string FromAddress = _config["EmailSettings:SenderEmail"];
+            string FromAdressTitle = _config["EmailSettings:SenderName"];
+            string ToAddress = "";
+            string ToAddressTitle = "";
+
+            var bodyBuilder = new BodyBuilder();
+            var mimeMessage = new MimeMessage();
+            //show = false;
+            ToAddress = "";
+            ToAddressTitle = "";
+
+            string Subject = subject;            
+            bodyBuilder.HtmlBody = htmlBody;
+            mimeMessage.From.Add(new MailboxAddress(FromAdressTitle, FromAddress));
+            mimeMessage.Subject = Subject;
+            mimeMessage.Body = bodyBuilder.ToMessageBody();
+            ToAddressTitle = toAddressTitle;
+            ToAddress = toAddress;
+            mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
+
+            //Check configuration
+            var serverAddress = _config["EmailSettings:SmtpServer"];
+            var emailPort = _config["EmailSettings:Port"];
+            var emailUsername = _config["EmailSettings:Username"];
+            var emailPass = _config["EmailSettings:Password"];
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                try
+                {
+                    client.Connect(serverAddress, Convert.ToInt32(emailPort), false);
+                    client.Authenticate(emailUsername, emailPass);
+                    client.Send(mimeMessage);
+                    client.Disconnect(true);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (client.IsConnected == true)
+                    {
+                        client.Disconnect(true);
+                    }
+                }
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel forgotPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(forgotPasswordModel);
+            var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email);
+            if (user == null)
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callback = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+            var htmlBody = "Reset Password for " + user.Email + " " + token + " " + callback;
+            string from = "Appointment Clinic";
+            string subject = "Reset Password";
+            string status = "Success";
+            string toTitle = user.Email;
+            string toEmail = user.Email;
+            await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+            return RedirectToAction(nameof(ForgotPasswordConfirmation));
+        }
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            var model = new ResetPasswordViewModel { Token = token, Email = email };
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPasswordPost(ResetPasswordViewModel resetPasswordModel)
+        {
+            if (!ModelState.IsValid)
+                return View(resetPasswordModel);
+            var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email);
+            if (user == null)
+                RedirectToAction(nameof(ResetPasswordConfirmation));
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
+            if (!resetPassResult.Succeeded)
+            {
+                foreach (var error in resetPassResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+                return View();
+            }
+            return RedirectToAction(nameof(ResetPasswordConfirmation));
+        }
+        [HttpGet]
+        public IActionResult ResetPasswordConfirmation()
+        {
+            return View();
+        }
         public async Task<IActionResult> Index(string sortOrder, string search, int? page)
         {
             ViewData["UserSetupParent"] = parent;
@@ -77,7 +193,7 @@ namespace Appointment.Controllers
                     break;
                 case "eml_d":
                     sortedItems = sortedItems.OrderByDescending(i => i.Email);
-                    break;                
+                    break;
                 default:
                     sortedItems = sortedItems.OrderBy(i => i.Id);
                     break;
@@ -120,7 +236,7 @@ namespace Appointment.Controllers
             };
 
             return View();
-        }        
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -205,9 +321,9 @@ namespace Appointment.Controllers
             }
 
 
-            RegisterViewModel rgvm = new RegisterViewModel();           
+            RegisterViewModel rgvm = new RegisterViewModel();
             rgvm.Name = getUser.Name;
-            rgvm.Email = getUser.Email;                   
+            rgvm.Email = getUser.Email;
 
             return View(rgvm);
         }
@@ -222,12 +338,12 @@ namespace Appointment.Controllers
             if (userName == null)
             {
                 return NotFound();
-            }         
+            }
 
             var getUser = await _userManager.FindByEmailAsync(userName);
 
             getUser.Name = rvm.Name;
-            getUser.Email = rvm.Email;           
+            getUser.Email = rvm.Email;
 
             var result = await _userManager.UpdateAsync(getUser);
 
@@ -251,7 +367,7 @@ namespace Appointment.Controllers
                 };
 
             ViewData["MyUser"] = getUser;
-           
+
             return View(rvm);
         }
 
@@ -429,49 +545,49 @@ namespace Appointment.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPasswordSubmit(RegisterViewModel vm)
-        {
-            ViewData["UserSetupParent"] = parent;
-            ViewData["ListUserActive"] = active;
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ResetPasswordSubmit(RegisterViewModel vm)
+        //{
+        //    ViewData["UserSetupParent"] = parent;
+        //    ViewData["ListUserActive"] = active;
 
-            var userPassReset = await _userManager.FindByEmailAsync(vm.Email);
+        //    var userPassReset = await _userManager.FindByEmailAsync(vm.Email);
 
-            if (userPassReset != null)
-            {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(userPassReset);
+        //    if (userPassReset != null)
+        //    {
+        //        var token = await _userManager.GeneratePasswordResetTokenAsync(userPassReset);
 
-                var result = await _userManager.ResetPasswordAsync(userPassReset, token, vm.Password);
+        //        var result = await _userManager.ResetPasswordAsync(userPassReset, token, vm.Password);
 
-                if (result.Succeeded)
-                {
-                    var Email = vm.Email;
-                    return RedirectToAction("ResetPasswordSuccess", "Account", Email);
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
-                    return View(vm);
-                }
-            }
+        //        if (result.Succeeded)
+        //        {
+        //            var Email = vm.Email;
+        //            return RedirectToAction("ResetPasswordSuccess", "Account", Email);
+        //        }
+        //        else
+        //        {
+        //            foreach (var error in result.Errors)
+        //            {
+        //                ModelState.AddModelError("", error.Description);
+        //            }
+        //            return View(vm);
+        //        }
+        //    }
 
-            return View(vm);
-        }
+        //    return View(vm);
+        //}
 
-        public IActionResult ResetPasswordSuccess(string Email)
-        {
-            ViewData["Email"] = Email;
-            return View();
-        }
-        public async Task<IActionResult> SuccessfulChangePassword()
-        {
-            await _singInManager.SignOutAsync();
-            return View();
-        }
+        //public IActionResult ResetPasswordSuccess(string Email)
+        //{
+        //    ViewData["Email"] = Email;
+        //    return View();
+        //}
+        //public async Task<IActionResult> SuccessfulChangePassword()
+        //{
+        //    await _singInManager.SignOutAsync();
+        //    return View();
+        //}
 
         public IActionResult IndexRoles(string sortOrder, string search, int? page)
         {

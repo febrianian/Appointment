@@ -1,7 +1,10 @@
 using Appointment.Models;
 using Appointment.Services;
+using Appointment.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NETCore.MailKit.Core;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +21,7 @@ builder.Services.AddDbContext<AppointmentContext>(options =>
 });
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppointmentContext>();
+    .AddEntityFrameworkStores<AppointmentContext>().AddDefaultTokenProviders(); ;
 builder.Services.AddTransient<IAppointmentService, AppointmentService>();
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();

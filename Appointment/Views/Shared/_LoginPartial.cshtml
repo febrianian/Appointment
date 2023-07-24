@@ -19,5 +19,10 @@ else
             @*@Html.ActionLink("Sign In", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })*@
             <a class="nav-link text-white" id="loginLink" asp-controller="Account" asp-action="Login">Sign In</a>
         </li>
+        <li>
+            <div class="form-group">
+                 <a class="nav-link text-white" id="loginLink" asp-controller="Account" asp-action="ForgotPassword">Forgot Password</a>
+            </div>
+        </li>
     </ul>
 }

@@ -37,8 +37,7 @@ namespace Appointment.Utility
         {
             return new List<SelectListItem>
                 {
-                    new SelectListItem{Value=Helper.Patient,Text=Helper.Patient},
-                    new SelectListItem{Value=Helper.Doctor,Text=Helper.Doctor}
+                    new SelectListItem{Value=Helper.Patient,Text=Helper.Patient}
                 };
         }
 
