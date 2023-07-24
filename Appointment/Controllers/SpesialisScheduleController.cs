@@ -262,6 +262,11 @@ namespace Appointment.Controllers
             ViewData["Hours1"] = new SelectList(duration, "Value", "Text", data.StartDate);
             ViewData["Hours2"] = new SelectList(duration, "Value", "Text", data.EndDate);
 
+            var status = new List<SelectListItem>();
+            status.Add(new SelectListItem { Text = "Active", Value = "A" });
+            status.Add(new SelectListItem { Text = "Inactive", Value = "N" });
+            ViewData["Status"] = new SelectList(status, "Value", "Text");
+
             return View(vm);
         }
 
@@ -282,6 +287,7 @@ namespace Appointment.Controllers
                 var data = edit.Single();
                 data.IdSpesialis = model.IdSpesialis;
                 data.UserId = model.UserId;
+                data.Status = model.Status;
                 data.StartDate = updatedStartDate;
                 data.EndDate = updatedEndDate;
                 data.DateModified = DateTime.Now;
