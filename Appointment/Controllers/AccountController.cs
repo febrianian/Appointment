@@ -96,17 +96,27 @@ namespace Appointment.Controllers
         {
             if (!ModelState.IsValid)
                 return View(forgotPasswordModel);
+
             var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email);
+
             if (user == null)
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
+
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var callback = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
-            var htmlBody = "Reset Password for " + user.Email + " " + token + " " + callback;
+
+            var htmlBody = "Reset Password for " + user.Email + "<br/>";
+            htmlBody += "<br/>";
+            htmlBody += "Here link to reset password : " + callback + "<br/>";
+            htmlBody += "<br/>";
+            htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+            
             string from = "Appointment Clinic";
             string subject = "Reset Password";
             string status = "Success";
             string toTitle = user.Email;
             string toEmail = user.Email;
+
             await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
