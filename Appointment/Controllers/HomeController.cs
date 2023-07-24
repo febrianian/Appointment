@@ -1,7 +1,9 @@
 ﻿using Appointment.Models;
 using Appointment.Services;
+using Appointment.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using System.Diagnostics;
 
@@ -29,72 +31,63 @@ namespace Appointment.Controllers
             return View(spesialis);
         }
 
-        public async Task SentEmail(string subject, string status, string from, bool show)
+        public async Task<IActionResult> DoctorSpesialis(int idSpesialis)
         {
-            //send Email Here
-            string FromAddress = _config["EmailSettings:SenderEmail"];
-            string FromAdressTitle = _config["EmailSettings:SenderName"];
-            string ToAddress = "";
-            string ToAddressTitle = "";
+            var spesialis = (from spes in _context.Spesialis
+                            join sche in _context.SpesialisSchedule on spes.Id equals sche.IdSpesialis
+                            join usr in _context.Users on sche.UserId equals usr.Id
+                            where spes.Id == idSpesialis && spes.Status == "A"
+                            select new
+                            {
+                                spes.Id,
+                                spes.SpesialisName,
+                                UserId = usr.Id,
+                                usr.Name
+                            }).Distinct();
 
-            var bodyBuilder = new BodyBuilder();
-            var mimeMessage = new MimeMessage();
-            //show = false;
-            ToAddress = "";
-            ToAddressTitle = "";
+            var time = (from sche in _context.SpesialisSchedule
+                        join usr in spesialis on sche.UserId equals usr.UserId
+                        where sche.Status == "A"
+                        select new
+                        {
+                            sche.IdSpesialisSchedule,
+                            sche.UserId,
+                            sche.ScheduleDay,
+                            sche.StartDate,
+                            sche.EndDate
+                        }).Distinct();
 
-            string Subject = subject;
-            string htmlBody = "System Info:<br/>";
-            htmlBody += "<style>\r\n    table {\r\n      border-collapse: collapse;\r\n      width: 30%;\r\n    }\r\n    table td, table th {\r\n      border: 1px solid black;\r\n      padding: 8px;\r\n      text-align: left;\r\n    }\r\n    table th {\r\n      background-color: #f2f2f2;\r\n    }\r\n  </style>";
-            htmlBody += status + " getting new data from " + from + ".<br/><br/>";
-
-            if (show == false)
+            List<SpesialisScheduleViewModel> items = new List<SpesialisScheduleViewModel>();
+            List<SpesialisScheduleViewModel> itemsTime = new List<SpesialisScheduleViewModel>();
+            
+            foreach(var data in spesialis.ToList())
             {
-                htmlBody += "Last Try: " + DateTime.Now.ToString("dd MMMM yyyy hh:mm:ss tt") + "<br/><br/>";
+                SpesialisScheduleViewModel vm = new SpesialisScheduleViewModel();
+                vm.IdSpesialis = data.Id;
+                vm.SpesialisName = data.SpesialisName;
+                vm.UserId = data.UserId;
+                vm.Name = data.Name;
+                items.Add(vm);
             }
-            else if (show == true)
+
+            foreach (var data in time.ToList().OrderBy(i => i.IdSpesialisSchedule))
             {
-
+                SpesialisScheduleViewModel vm = new SpesialisScheduleViewModel();
+                //vm.IdSpesialis = data.Id;
+                vm.UserId = data.UserId;
+                vm.ScheduleDay = data.ScheduleDay;
+                vm.StartDate = data.StartDate.ToString("HH:mm");
+                vm.EndDate = data.EndDate.ToString("HH:mm");
+                itemsTime.Add(vm);
             }
 
-            htmlBody += "Here's the current data in eSelling:<br/><br/>";            
-            htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
-            bodyBuilder.HtmlBody = htmlBody;
-            mimeMessage.From.Add(new MailboxAddress(FromAdressTitle, FromAddress));
-            mimeMessage.Subject = Subject;
-            mimeMessage.Body = bodyBuilder.ToMessageBody();
-            ToAddressTitle = "febrian@mpm-insurance.com";
-            ToAddress = "febrian@mpm-insurance.com";
-            mimeMessage.To.Add(new MailboxAddress(ToAddressTitle, ToAddress));
+            var timeGroupedByUserId = itemsTime.GroupBy(t => t.UserId);
 
-            //Check configuration
-            var serverAddress = _config["EmailSettings:SmtpServer"];
-            var emailPort = _config["EmailSettings:Port"];
-            var emailUsername = _config["EmailSettings:Username"];
-            var emailPass = _config["EmailSettings:Password"];
+            ViewData["IdSpesialis"] = spesialis.FirstOrDefaultAsync().Id;
+            ViewData["TimeGroupedByUserId"] = timeGroupedByUserId;
 
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                try
-                {
-                    client.Connect(serverAddress, Convert.ToInt32(emailPort), false);
-                    client.Authenticate(emailUsername, emailPass);
-                    client.Send(mimeMessage);
-                    client.Disconnect(true);
-                }
-                catch(Exception ex)
-                {
-                    throw ex;
-                }
-                finally
-                {
-                    if (client.IsConnected == true)
-                    {
-                        client.Disconnect(true);
-                    }
-                }
-            }
-        }        
+            return View(items);
+        }
 
         [AllowAnonymous]
         public async Task<IActionResult> PrivacyAsync()
