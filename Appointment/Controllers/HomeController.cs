@@ -1,9 +1,11 @@
-﻿using Appointment.Models;
+﻿using Appointment.Migrations;
+using Appointment.Models;
 using Appointment.Services;
 using Appointment.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using MimeKit;
 using System.Diagnostics;
 
@@ -26,9 +28,8 @@ namespace Appointment.Controllers
         [Authorize(Roles = "Doctor, Patient, Admin")]
         public IActionResult Index()
         {
-            var spesialis = _context.Spesialis.Where(i => i.Status == "A").ToList();
-            ViewData["DataSpesialis"] = spesialis;
-            return View(spesialis);
+            ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
+            return View();
         }
 
         public async Task<IActionResult> DoctorSpesialis(int idSpesialis)
@@ -89,6 +90,77 @@ namespace Appointment.Controllers
             return View(items);
         }
 
+        public List<SpesialisScheduleViewModel> ListSpesialis(int id)
+        {
+            List<SpesialisScheduleViewModel> model = new List<SpesialisScheduleViewModel>();
+            var result = (from user in _context.Users
+                          join schedule in _context.SpesialisSchedule on user.Id equals schedule.UserId
+                          join spesialis in _context.Spesialis on schedule.IdSpesialis equals spesialis.Id
+                          where spesialis.Status == "A" && spesialis.Id == id
+                          select new
+                          {
+                              spesialis.Id,
+                              UserId = user.Id,
+                              user.Name,
+                              spesialis.SpesialisName,
+                              spesialis.Status
+                          }).Distinct();
+
+            foreach (var item in result)
+            {
+                SpesialisScheduleViewModel vm = new SpesialisScheduleViewModel();
+                vm.IdSpesialis = item.Id;
+                vm.UserId = item.UserId;
+                vm.SpesialisName = item.SpesialisName;
+                vm.Status = item.Status;
+                vm.Name = item.Name;
+                model.Add(vm);
+            }
+
+            return model;
+        }
+
+        public List<SpesialisScheduleViewModel> ListSpesialisHours(int id)
+        {
+            List<SpesialisScheduleViewModel> model = new List<SpesialisScheduleViewModel>();
+            var result = (from time in _context.SpesialisSchedule
+                          join usr in _context.Users on time.UserId equals usr.Id
+                          where time.IdSpesialis == id && time.Status == "A"
+                          select new
+                          {
+                              time.IdSpesialis,
+                              time.IdSpesialisSchedule,
+                              usr.Id,
+                              usr.Name,
+                              time.ScheduleDay,
+                              time.StartDate,
+                              time.EndDate
+                          }).Distinct();
+
+
+            foreach (var item in result.OrderBy(i => i.IdSpesialisSchedule))
+            {
+                SpesialisScheduleViewModel vm = new SpesialisScheduleViewModel();
+                vm.IdSpesialis = item.IdSpesialis;
+                vm.IdSpesialisSchedule = item.IdSpesialisSchedule;
+                vm.UserId = item.Id;
+                vm.Name = item.Name;
+                vm.ScheduleDay = item.ScheduleDay;
+                vm.StartDate = item.StartDate.ToString("HH:mm");
+                vm.EndDate = item.EndDate.ToString("HH:mm");
+                model.Add(vm);
+            }
+            return model;
+        }
+
+        public async Task<IActionResult> DashboardSpesialis(DashboardSpesialisViewModel model)
+        {
+            model.ListSpesialis = ListSpesialis(model.IdSpesialis);
+            //var listSpesialis = ListSpesialis(model.IdSpesialis);
+            model.ListSpesialisHours = ListSpesialisHours(model.IdSpesialis);
+            //model.ListSpesialisHours = ListSpesialisHours(model.IdSpesialis, listSpesialis.FirstOrDefault().UserId);
+            return View(model);
+        }
         [AllowAnonymous]
         public async Task<IActionResult> PrivacyAsync()
         {

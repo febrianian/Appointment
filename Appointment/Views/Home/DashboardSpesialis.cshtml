@@ -1,0 +1,81 @@
+﻿@model Appointment.ViewModels.DashboardSpesialisViewModel
+<style>
+    .custom-radio-btn {
+        position: relative;
+        border: 1px solid #ccc;
+        border-radius: 0.25rem;
+        padding: 8px 20px;
+        cursor: pointer;
+    }
+
+        .custom-radio-btn.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Hiding the default radio buttons */
+        .custom-radio-btn input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+</style>
+
+@{
+    var hoursGroupedByUser = Model.ListSpesialisHours.GroupBy(h => h.UserId);
+}
+
+@if (Model.ListSpesialis.Count() == 0)
+{
+    <p>No data available for schedule of doctor,  <span><a asp-controller="Home" asp-action="Index">back to home.</a></span> </p>
+}
+else
+{
+    <div class="contrainer ml-4">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-info">Home</a>
+    </div>
+
+    @foreach (var data in Model.ListSpesialis)
+    {
+        <div class="card-body">
+            <div class="card-container d-flex flex-row flex-wrap">
+                <div class="card col-md-12 mb-6 p-1">
+                    <h5 class="card-header bg-info text-white">@data.Name</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Info Schedule :</label>
+                                <br>
+                                <div class="row">
+                                    @foreach (var userHours in hoursGroupedByUser.Where(g => g.Key == data.UserId))
+                                    {
+                                        @foreach (var time in userHours)
+                                        {
+                                            @*<div class="col-md-4">*@
+                                            <div class="btn" data-toggle="buttons">
+                                                <label class="btn btn-success custom-radio-btn">
+                                                    <input type="radio" name="options" id="option1" autocomplete="off">
+                                                    @time.ScheduleDay | @time.StartDate - @time.EndDate
+                                                </label>
+                                            </div>
+                                            @*</div>*@
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button asp-controller="AppointmentDoctor" asp-action="Index" asp-route-userId="" class="btn btn-info btn-block float-left form-control">Buat Janji</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+

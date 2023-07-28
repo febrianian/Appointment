@@ -87,7 +87,7 @@
             <hr>
             <div class="card-container d-flex flex-row flex-wrap">
                 @foreach (var data in ViewBag.DataSpesialis)
-                {
+                {                    
                     <div class="card col-md-6 mb-3 p-1">
                         <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
                         <div class="card-body">
@@ -97,7 +97,7 @@
                                 </div>
                                 <div class="col-md-8">
                                     <p class="card-text">@data.Description</p>
-                                    <a asp-controller="Home" asp-action="DoctorSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
+                                    <a asp-controller="Home" asp-action="DashboardSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
                                 </div>
                             </div>
                         </div>
