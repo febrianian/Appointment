@@ -1,0 +1,126 @@
+﻿@model X.PagedList.IPagedList<Appointment.ViewModels.StatusTransactionViewModel>
+@using X.PagedList.Mvc.Core
+
+<style>
+    th {
+        text-align: center;
+        font-size: small;
+    }
+
+    .table {
+        margin-top: 10px;
+    }
+</style>
+
+<form>
+    @Html.AntiForgeryToken()
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <center>
+                                    <h3>Status Transaction</h3>
+                                </center>
+                            </div>
+                        </div>
+                        <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-primary text-white">Home</a>
+                                &nbsp;
+                                &nbsp;
+                                <a asp-action="Create" class="btn btn-primary text-white">Create</a>
+                            </div>
+                            <div class="col-md-6">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="Search" aria-label="Search" class="form-control form-control-sm" name="search" value="@ViewData["CurrentFilter"]" />
+                                    <div class="input-group-prepend">
+                                        <button type="submit" value="Search" class="btn btn-primary btn-sm" asp-action="Index" formmethod="get">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="tableList" class="table table-bordered table-hover">
+                                        <thead class="bg-gray-light">
+                                            <tr>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Id"]" asp-route-search="@ViewData["CurrentFilter"]">Name</a></th>
+                                                <th><a asp-action="Index" asp-route-sortOrder="@ViewData["Name"]" asp-route-search="@ViewData["CurrentFilter"]">Status Name</a></th>
+                                                <th>Status</th>
+                                                <th>User Craeted</th>
+                                                <th>Date Created</th>
+                                                <th>User Modified</th>
+                                                <th>Date Modified</th>
+                                               <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@Html.DisplayFor(modelItem => item.IdStatus)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.StatusName)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.UserCreated)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.UserModified)</td>
+                                                    <td>@Html.DisplayFor(modelItem => item.DateModified)</td>
+                                                    <td width="30%" class="m-5">
+                                                        <button type="submit" value="Edit" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="Edit" asp-route-id="@item.IdStatus" formmethod="post">
+                                                            <i class="fas fa-edit"></i>&nbsp;
+                                                            Edit
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, search = ViewBag.CurrentFilter }),
+                        new X.PagedList.Web.Common.PagedListRenderOptions
+                        {
+                        LiElementClasses = new string[] { "page-item" },
+                        PageClasses = new string[] { "page-link" }
+                        })
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script>
+        $(function () {
+            $('#tableList').DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

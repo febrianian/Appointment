@@ -1,0 +1,35 @@
+﻿@model Appointment.ViewModels.StatusTransactionViewModel
+
+<form method="post" asp-action="PostCreate" asp-controller="StatusTransaction">
+    <h4>Schedule Spesialis</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="IdStatus">Set Id Status</label>
+        <div class=" col-md-10">
+            <input type="text" asp-for="IdStatus" class="form-control"/>
+            <span asp-validation-for="IdStatus" class="text-danger"></span>
+        </div>
+    </div>   
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="StatusName">Status Name</label>
+        <div class=" col-md-10">
+            <input type="text" asp-for="StatusName" class="form-control"/>
+            <span asp-validation-for="StatusName" class="text-danger"></span>
+        </div>
+    </div>    
+    <div class="form-group row">
+        <label class="col-md-2">Action</label>
+        <div class="col-md-5">
+            <a asp-controller="StatusTransaction" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+        </div>
+        <div class="col-md-5">
+            <input type="submit" value="Save" class="btn btn-primary form-control text-white" />
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+}

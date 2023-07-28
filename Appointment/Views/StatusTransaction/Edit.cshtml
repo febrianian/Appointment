@@ -1,0 +1,66 @@
+﻿@model Appointment.ViewModels.StatusTransactionViewModel
+
+<form method="post">
+    <h4>Status Transaction</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="IdStatus" />
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="StatusName">Status Name</label>
+        <div class=" col-md-10">
+            <input type="text" asp-for="StatusName" class="form-control" />
+            <span asp-validation-for="StatusName" class="text-danger"></span>
+        </div>
+    </div>   
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="Status">Status</label>
+        <div class=" col-md-10">
+            <input asp-for="Status" readonly class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserCreated">User Created</label>
+        <div class=" col-md-10">
+            <input asp-for="UserCreated" class="form-control" readonly />
+            <span asp-validation-for="UserCreated" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="DateCreated">Date Created</label>
+        <div class=" col-md-10">
+            <input asp-for="DateCreated" class="form-control" readonly />
+            <span asp-validation-for="DateCreated" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="UserModified">User Modified</label>
+        <div class=" col-md-10">
+            <input asp-for="UserModified" class="form-control" readonly />
+            <span asp-validation-for="UserModified" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2" asp-for="DateModified">Date Modified</label>
+        <div class=" col-md-10">
+            <input asp-for="DateModified" class="form-control" readonly />
+            <span asp-validation-for="DateModified" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-2">Action</label>
+        <div class="col-md-4">
+            <a asp-controller="StatusTransaction" asp-action="Index" class="btn btn-primary form-control text-white">Back to List</a>
+        </div>
+        <div class="col-md-3">
+            <input type="submit" value="Edit" class="btn btn-primary form-control text-white" asp-controller="StatusTransaction" asp-action="PostEdit" asp-route-id="@Model.IdStatus" />
+        </div>
+        <div class="col-md-3">
+            <input type="submit" value="Delete" class="btn btn-danger form-control text-white" asp-controller="StatusTransaction" asp-action="PostDelete" asp-route-id="@Model.IdStatus" />
+        </div>               
+    </div>
+</form>
+
+@section Scripts{
+        <partial name="_ValidationScriptsPartial" />
+
+}
