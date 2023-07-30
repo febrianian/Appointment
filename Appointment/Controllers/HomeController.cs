@@ -49,7 +49,16 @@ namespace Appointment.Controllers
             vm.ListTransactionPatient = itemsTransactionPatient;
             ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
             vm.UserId = _context.Users.Where(i => i.Email == User.Identity.Name).Single().Id;
-            vm.Name = itemsTransactionPatient.FirstOrDefault().PatientName;
+
+            if(itemsTransactionPatient.Count> 0)
+            {
+                vm.Name = itemsTransactionPatient.FirstOrDefault().PatientName;
+            }
+            else
+            {
+                vm.Name = "";
+            }
+            
             return View(vm);
         }
 

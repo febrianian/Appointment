@@ -3,16 +3,81 @@ using Appointment.Models;
 using Appointment.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MimeKit;
+using System.Net;
 
 namespace Appointment.Controllers
 {
     public class AppointmentDoctorController : Controller
     {
         private readonly AppointmentContext _context;
+        private readonly IConfiguration _config;
 
-        public AppointmentDoctorController(AppointmentContext context)
+        public AppointmentDoctorController(AppointmentContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
+        }
+        public async Task SentEmail(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress)
+        {
+            //Check configuration
+            var dev = _config["EmailSettings:DeveloperMode"];
+            //send Email Here
+            string FromAddress = _config["EmailSettings:SenderEmail"];
+            string FromAdressTitle = _config["EmailSettings:SenderName"];
+            string ToAddress = "";
+            string ToAddressTitle = "";
+
+            var bodyBuilder = new BodyBuilder();
+            var mimeMessage = new MimeMessage();
+            ToAddress = "";
+            ToAddressTitle = "";
+
+            string Subject = subject;
+            bodyBuilder.HtmlBody = htmlBody;
+            mimeMessage.From.Add(new MailboxAddress(FromAdressTitle, FromAddress));
+            mimeMessage.Subject = Subject;
+            mimeMessage.Body = bodyBuilder.ToMessageBody();
+            ToAddressTitle = toAddressTitle;
+            ToAddress = toAddress;
+
+            if (dev == "false")
+            {
+                mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
+            }
+            else if (dev == "true")
+            {
+                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+            }
+
+            //Check configuration
+            var serverAddress = _config["EmailSettings:SmtpServer"];
+            var emailPort = _config["EmailSettings:Port"];
+            var emailUsername = _config["EmailSettings:Username"];
+            var emailPass = _config["EmailSettings:Password"];
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                try
+                {
+                    client.Connect(serverAddress, Convert.ToInt32(emailPort), false);
+                    client.Authenticate(emailUsername, emailPass);
+                    client.Send(mimeMessage);
+                    client.Disconnect(true);
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+                finally
+                {
+                    if (client.IsConnected == true)
+                    {
+                        client.Disconnect(true);
+                    }
+                }
+            }
         }
         public IActionResult Index(AppointmentDoctorViewModel vm, int idSpesialis, string userId)
         {
@@ -121,6 +186,29 @@ namespace Appointment.Controllers
                     _context.Add(model);
                     await _context.SaveChangesAsync();
                     transSql.Commit();
+
+                    string subject = "Appoitment Successfully Submited !";
+                    string htmlBody = "Details are as follows:<br/><br/>";
+
+                    var spesialis = _context.Spesialis.Where(x => x.Id == model.IdSpesialis).Single().SpesialisName;
+
+                    htmlBody += "<table>";
+                    htmlBody += "<tr><td>Spesialis</td><td>: " + spesialis + "</td></tr>";
+                    htmlBody += "<tr><td>Doctor</td><td>: " + doctor.Name + "</td></tr>";
+                    htmlBody += "<tr><td>Tanggal Konsultasi</td><td>: " + model.DateAppointment.Date.ToString("dd MMMM yyyy") + "</td></tr>";
+                    htmlBody += "<tr><td>Hari / Waktu</td><td>: " + model.Day + " / " + model.TimeAppointment + "</td></tr>";
+                    htmlBody += "<tr><td>Keluhan</td><td>: " + model.ReasonOfSick + "</td></tr>";                    
+                    htmlBody += "</table><br/><br/>";
+                    htmlBody += "<br/><br/>";
+                    htmlBody += "Mohon untuk datang minimal 15 menit sebelum waktu yang sudah ditentukan, terima kasih.";
+                    htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+
+                    string from = "Appointment Clinic";
+                    string status = "Success";
+                    string toTitle = user.Email;
+                    string toEmail = user.Email;
+
+                    await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
 
                     return RedirectToAction("Index", "Home");
                 }

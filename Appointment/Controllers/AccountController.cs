@@ -64,7 +64,7 @@ namespace Appointment.Controllers
             }
             else if(dev == "true")
             {
-                mimeMessage.To.Add(new MailboxAddress("febrian@mpm-insurance.com", "febrian@mpm-insurance.com"));
+                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
             }
             
             //Check configuration
@@ -320,8 +320,8 @@ namespace Appointment.Controllers
                         string from = "Appointment Clinic";
                         string subject = "Registration User";
                         string status = "Success";
-                        string toTitle = "febrian.evolution@gmail.com";
-                        string toEmail = "febrian.evolution@gmail.com";
+                        string toTitle = user.Email;
+                        string toEmail = user.Email;
                         await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
 
                         return RedirectToAction("Index", "Home");
