@@ -1,6 +1,5 @@
 ﻿using Appointment.Migrations;
 using Appointment.Models;
-using Appointment.Services;
 using Appointment.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -156,11 +155,10 @@ namespace Appointment.Controllers
         public async Task<IActionResult> DashboardSpesialis(DashboardSpesialisViewModel model)
         {
             model.ListSpesialis = ListSpesialis(model.IdSpesialis);
-            //var listSpesialis = ListSpesialis(model.IdSpesialis);
             model.ListSpesialisHours = ListSpesialisHours(model.IdSpesialis);
-            //model.ListSpesialisHours = ListSpesialisHours(model.IdSpesialis, listSpesialis.FirstOrDefault().UserId);
             return View(model);
         }
+
         [AllowAnonymous]
         public async Task<IActionResult> PrivacyAsync()
         {

@@ -67,7 +67,7 @@ else
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button asp-controller="AppointmentDoctor" asp-action="Index" asp-route-userId="" class="btn btn-info btn-block float-left form-control">Buat Janji</button>
+                                    <a asp-controller="AppointmentDoctor" asp-action="Index" asp-route-userId="@data.UserId" asp-route-idSpesialis="@data.IdSpesialis" class="btn btn-info btn-block float-left form-control">Buat Janji</a>
                                 </div>
                             </div>
                         </div>

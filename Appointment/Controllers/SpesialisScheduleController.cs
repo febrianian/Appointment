@@ -1,5 +1,4 @@
 ﻿using Appointment.Models;
-using Appointment.Services;
 using Appointment.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,12 +9,10 @@ namespace Appointment.Controllers
     public class SpesialisScheduleController : Controller
     {
         private readonly AppointmentContext _context;
-        private readonly IAppointmentService _appointmentService;
 
-        public SpesialisScheduleController(AppointmentContext context, IAppointmentService appointmentService)
+        public SpesialisScheduleController(AppointmentContext context)
         {
             _context = context;
-            _appointmentService = appointmentService;
         }
         public async Task<IActionResult> Index(string sortOrder, string search, int? page)
         {

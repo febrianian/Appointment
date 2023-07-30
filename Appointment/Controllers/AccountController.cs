@@ -64,7 +64,7 @@ namespace Appointment.Controllers
             }
             else if(dev == "true")
             {
-                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+                mimeMessage.To.Add(new MailboxAddress("febrian@mpm-insurance.com", "febrian@mpm-insurance.com"));
             }
             
             //Check configuration
@@ -86,7 +86,7 @@ namespace Appointment.Controllers
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    return;
                 }
                 finally
                 {
@@ -309,10 +309,12 @@ namespace Appointment.Controllers
                     if (result.Succeeded)
                     {
                         //send email
+                        string loginLink = "https://localhost:44342/Account/Login?ReturnUrl=%2F";
+
                         var htmlBody = "Registration Successfully !!<br/>";
                         htmlBody += "<br/>";
                         htmlBody += "Hii .... " + user.Name + " terima kasih sudah registrasi pada system Appointment kami<br/>";
-                        htmlBody += "<br/>";
+                        htmlBody += "Silahkan login melalui link berikut ini <a href=\"" + loginLink + "\">Login</a><br/>";
                         htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
 
                         string from = "Appointment Clinic";
