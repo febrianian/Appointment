@@ -2,69 +2,123 @@
 
 <h2>Sign Up</h2>
 <form method="post" asp-action="Register" asp-controller="Account">
-    @if (User.IsInRole(Appointment.Utility.Helper.Admin))
-    {
-        <h4>Register an admin account.</h4>
-    }
-    else
-    {
-        <h4>Create a new account.</h4>
-    }
+    <h4>Create a new account.</h4>
     <hr />
     <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="form-group row">
-        <label class="col-md-2" asp-for="Name"></label>
-        <div class=" col-md-10">
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-md-2" asp-for="Email"></label>
-        <div class=" col-md-10">
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-md-2" asp-for="Password"></label>
-        <div class=" col-md-10">
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-md-2" asp-for="ConfirmPassword"></label>
-        <div class=" col-md-10">
-            <input asp-for="ConfirmPassword" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-    </div>
     @if (User.IsInRole("Admin"))
     {
         <div class="form-group row">
-            <label class="col-md-2" asp-for="RoleName"></label>
-        <div class=" col-md-10">
-                <select asp-for="RoleName"
-                    asp-items="@Appointment.Utility.Helper.GetRolesForDropDown(User.IsInRole(Appointment.Utility.Helper.Admin))"
-                    class="form-control"></select>
+            <label class="col-md-2" asp-for="IdNumber">KTP/Passport</label>
+            <div class=" col-md-10">
+                <input asp-for="IdNumber" class="form-control" />
+                <span asp-validation-for="IdNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Name"></label>
+            <div class=" col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Email"></label>
+            <div class=" col-md-10">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Password"></label>
+            <div class=" col-md-10">
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="ConfirmPassword"></label>
+            <div class=" col-md-10">
+                <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
         </div>
-    }
-    else
-    {
         <div class="form-group row">
             <label class="col-md-2" asp-for="RoleName"></label>
             <div class=" col-md-10">
                 <select asp-for="RoleName"
-                    asp-items="@Appointment.Utility.Helper.GetRolesForDropDownPublic()"
+                    asp-items="@ViewBag.Roles"
                     class="form-control"></select>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
         </div>
-        
-    }    
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="BirthDate">Birth Date</label>
+            <div class=" col-md-10">
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Address"></label>
+            <div class=" col-md-10">
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="IdNumber">KTP/Passport</label>
+            <div class=" col-md-10">
+                <input asp-for="IdNumber" class="form-control" />
+                <span asp-validation-for="IdNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Name"></label>
+            <div class=" col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Email"></label>
+            <div class=" col-md-10">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Password"></label>
+            <div class=" col-md-10">
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="ConfirmPassword"></label>
+            <div class=" col-md-10">
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>        
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="BirthDate">Birth Date</label>
+            <div class=" col-md-10">
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-2" asp-for="Address"></label>
+            <div class=" col-md-10">
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>        
+    }
+
     <div class="form-group">
         <div class="col-md-10 offset-md-2">
             <input type="submit" value="Register" class="btn btn-success" />

@@ -235,7 +235,7 @@ namespace Appointment.Controllers
             IPagedList<RegisterViewModel> pagedListData = new StaticPagedList<RegisterViewModel>(items, pageNumber, pageSize, totalCount);
             return View("Index", pagedListData);
         }
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
             ViewData["UserSetupParent"] = parent;
             ViewData["ListUserActive"] = active;
@@ -245,6 +245,8 @@ namespace Appointment.Controllers
                 (new SelectListItem{ Text = "Male", Value = "M"}),
                 (new SelectListItem{ Text = "Female", Value = "F"})
             };
+
+            ViewData["Roles"] = GetAllRoles();
 
             return View();
         }
@@ -263,18 +265,36 @@ namespace Appointment.Controllers
                     UserName = rgvm.Email,
                     Email = rgvm.Email,
                     Name = rgvm.Name,
-                    UserCreated = User.Identity.Name
+                    UserCreated = User.Identity.Name,
+                    PhoneNumber = rgvm.PhoneNumber,
+                    Address = rgvm.Address,
+                    BirthDate = rgvm.BirthDate.Date,
+                    IdNumber = rgvm.IdNumber
                 };
 
                 if (ModelState.IsValid)
                 {
                     var result = await _userManager.CreateAsync(user, rgvm.Password);
 
+                    //add roles patient
+                    var getRole = "";
+
+                    if (User.IsInRole("Admin"))
+                    {
+                        getRole = rgvm.RoleName;
+                    }
+                    else
+                    {
+                        getRole = _context.Roles.Where(i => i.Name == "Patient").Single().Name;
+                    }
+
+                    var userdata = await GetUserById(user.Id);
+                    var resultData = await _userManager.AddToRoleAsync(userdata, getRole);
+
                     transSql.Commit();
 
                     if (result.Succeeded)
                     {
-                        //ViewData["RegisterName"] = rgvm.Name;
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -286,6 +306,7 @@ namespace Appointment.Controllers
                     }
                 }
 
+                ViewData["Roles"] = GetAllRoles();
                 return View(rgvm);
             }
         }

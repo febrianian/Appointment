@@ -12,6 +12,7 @@ namespace Appointment.ViewModels
         public string Name { get; set; }
         public string UserId { get; set; }
         public string UserName { get; set; }
+        public string PhoneNumber { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -28,5 +29,9 @@ namespace Appointment.ViewModels
         [Required]
         [Display(Name = "Role Name")]
         public string RoleName { get; set; }
+
+        public DateTime BirthDate { get; set; }
+        public string Address { get; set; }
+        public string IdNumber { get; set; }
     }
 }
