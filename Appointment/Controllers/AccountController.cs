@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using X.PagedList;
 using MimeKit;
 using System;
+using System.Net;
 
 namespace Appointment.Controllers
 {
@@ -35,6 +36,8 @@ namespace Appointment.Controllers
 
         public async Task SentEmail(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress)
         {
+            //Check configuration
+            var dev = _config["EmailSettings:DeveloperMode"];
             //send Email Here
             string FromAddress = _config["EmailSettings:SenderEmail"];
             string FromAdressTitle = _config["EmailSettings:SenderName"];
@@ -54,13 +57,22 @@ namespace Appointment.Controllers
             mimeMessage.Body = bodyBuilder.ToMessageBody();
             ToAddressTitle = toAddressTitle;
             ToAddress = toAddress;
-            mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
-
+            
+            if (dev == "false")
+            {
+                mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
+            }
+            else if(dev == "true")
+            {
+                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+            }
+            
             //Check configuration
             var serverAddress = _config["EmailSettings:SmtpServer"];
             var emailPort = _config["EmailSettings:Port"];
             var emailUsername = _config["EmailSettings:Username"];
             var emailPass = _config["EmailSettings:Password"];
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
             using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
@@ -69,6 +81,7 @@ namespace Appointment.Controllers
                     client.Connect(serverAddress, Convert.ToInt32(emailPort), false);
                     client.Authenticate(emailUsername, emailPass);
                     client.Send(mimeMessage);
+                    // Add this code before making the SMTP connection
                     client.Disconnect(true);
                 }
                 catch (Exception ex)
@@ -295,6 +308,20 @@ namespace Appointment.Controllers
 
                     if (result.Succeeded)
                     {
+                        //send email
+                        var htmlBody = "Registration Successfully !!<br/>";
+                        htmlBody += "<br/>";
+                        htmlBody += "Hii .... " + user.Name + " terima kasih sudah registrasi pada system Appointment kami<br/>";
+                        htmlBody += "<br/>";
+                        htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+
+                        string from = "Appointment Clinic";
+                        string subject = "Registration User";
+                        string status = "Success";
+                        string toTitle = "febrian.evolution@gmail.com";
+                        string toEmail = "febrian.evolution@gmail.com";
+                        await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+
                         return RedirectToAction("Index", "Home");
                     }
                     else

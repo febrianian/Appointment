@@ -26,7 +26,7 @@ namespace Appointment.ViewModels
         [Display(Name = "Confirm Password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-        [Required]
+        
         [Display(Name = "Role Name")]
         public string RoleName { get; set; }
 
