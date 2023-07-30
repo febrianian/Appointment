@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Appointment.ViewModels.HomeViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -89,6 +90,45 @@
     <br />
 }
 
+<div class="card mt-3 mb-5">
+    <div class="card-header">
+        <h4>Your Appointment Request</h4>
+    </div>
+    <div class="col-lg-12">
+        <div class="card-body">
+            <table id="tableList" class="table table-bordered table-hover">
+                <thead class="bg-gray-light">
+                    <tr>
+                        <th>Spesialis</th>
+                        <th>Doctor</th>
+                        <th>Patient</th>
+                        <th>Hari / Jam</th>
+                        <th>Status</th>
+                        <th>Keluhan</th>
+                        <th>Tgl. Appointment</th>
+                        <th>Tgl. Diajukan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ListTransactionPatient)
+                    {
+                        <tr>
+
+                            <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
+                            <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
+                            <td>@Html.DisplayFor(modelItem => item.StatusName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
+                            <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
+                            <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <div class="card">
     <div class="col-lg-12">
@@ -97,7 +137,7 @@
             <hr>
             <div class="card-container d-flex flex-row flex-wrap">
                 @foreach (var data in ViewBag.DataSpesialis)
-                {                    
+                {
                     <div class="card col-md-6 mb-3 p-1">
                         <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
                         <div class="card-body">

@@ -25,10 +25,29 @@ namespace Appointment.Controllers
         }
 
         [Authorize(Roles = "Doctor, Patient, Admin")]
-        public IActionResult Index()
+        public IActionResult Index(HomeViewModel vm)
         {
+            List<AppointmentClinicViewModel> itemsTransactionPatient = new List<AppointmentClinicViewModel>();
+            var transactionPatient = _context.AppointmentClinic.Where(i => i.UserCreated == User.Identity.Name).ToList();
+
+            foreach(var data in transactionPatient)
+            {
+                AppointmentClinicViewModel item = new AppointmentClinicViewModel();
+                item.Spesialis = _context.Spesialis.Where(i => i.Id == data.IdSpesialis).Single().SpesialisName;
+                item.PatientName = _context.Users.Where(i => i.Id == data.UserIdPatient).Single().Name;
+                item.DoctorName = _context.Users.Where(i => i.Id == data.UserIdDoctor).Single().Name;
+                item.Day = data.Day;
+                item.TimeAppointment = data.TimeAppointment;
+                item.DateAppointment = data.DateAppointment.Date;
+                item.DateCreated = data.DateCreated;
+                item.StatusName = _context.StatusTransaction.Where(i => i.IdStatus == data.IdStatus).Single().StatusName;
+                item.ReasonOfSick = data.ReasonOfSick;
+                itemsTransactionPatient.Add(item);
+            }
+
+            vm.ListTransactionPatient = itemsTransactionPatient;
             ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
-            return View();
+            return View(vm);
         }
 
         public async Task<IActionResult> DoctorSpesialis(int idSpesialis)
