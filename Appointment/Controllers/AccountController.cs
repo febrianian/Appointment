@@ -932,5 +932,14 @@ namespace Appointment.Controllers
         {
             return _roleManager.Roles.Any(e => e.Id == id);
         }
+
+        public async Task<IActionResult> UpdateProfile(string userId)
+        {
+            var user = _context.Users.Where(i => i.Id == userId).Single();
+            RegisterViewModel vm = new RegisterViewModel();
+            vm.UserId = userId;
+
+            return View(vm);
+        }
     }
 }

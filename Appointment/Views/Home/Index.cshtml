@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-
+<input type="hidden" asp-for="UserId" />
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
@@ -90,9 +90,46 @@
     <br />
 }
 
-<div class="card mt-3 mb-5">
+<div class="card mt-5 mb-5">
+    <div class="card-header"><h4>Update your Profile</h4></div>
+    <div class="col-lg-12">
+        <div class="card-body">
+            <h6>Make sure your Data Profile is Up to Date. Click <a asp-controller="Account" asp-action="UpdateProfile" asp-route-userId="@Model.UserId">here</a> to update</h6>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="col-lg-12">
+        <div class="card-body">
+            <h4>Dokter Available</h4>
+            <hr>
+            <div class="card-container d-flex flex-row flex-wrap">
+                @foreach (var data in ViewBag.DataSpesialis)
+                {
+                    <div class="card col-md-6 mb-3 p-1">
+                        <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img src="@data.ImagesPath" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;" />
+                                </div>
+                                <div class="col-md-8">
+                                    <p class="card-text">@data.Description</p>
+                                    <a asp-controller="Home" asp-action="DashboardSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-5 mb-5">
     <div class="card-header">
-        <h4>Your Appointment Request</h4>
+        <h4>Hii ... @Model.Name, this your Appointment Request</h4>
     </div>
     <div class="col-lg-12">
         <div class="card-body">
@@ -126,34 +163,6 @@
                     }
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="col-lg-12">
-        <div class="card-body">
-            <h4>Dokter Available</h4>
-            <hr>
-            <div class="card-container d-flex flex-row flex-wrap">
-                @foreach (var data in ViewBag.DataSpesialis)
-                {
-                    <div class="card col-md-6 mb-3 p-1">
-                        <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <img src="@data.ImagesPath" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;" />
-                                </div>
-                                <div class="col-md-8">
-                                    <p class="card-text">@data.Description</p>
-                                    <a asp-controller="Home" asp-action="DashboardSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
         </div>
     </div>
 </div>

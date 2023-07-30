@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using MimeKit;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Appointment.Controllers
 {
@@ -47,6 +48,8 @@ namespace Appointment.Controllers
 
             vm.ListTransactionPatient = itemsTransactionPatient;
             ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
+            vm.UserId = _context.Users.Where(i => i.Email == User.Identity.Name).Single().Id;
+            vm.Name = itemsTransactionPatient.FirstOrDefault().PatientName;
             return View(vm);
         }
 

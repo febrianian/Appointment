@@ -79,7 +79,7 @@ namespace Appointment.Controllers
                 int timeStartHour = startTime.Hour; // 6
                 int timeEndHour = endTime.Hour; // 16              
 
-                if (hour < timeStartHour || hour > timeEndHour) 
+                if (hour < timeStartHour && hour > timeEndHour) 
                 {
                     message = "Your time out of selection range";
                     ViewData["Message"] = message;
@@ -110,7 +110,7 @@ namespace Appointment.Controllers
                     model.Age = vm.Age;
                     model.DateAppointment = vm.DateAppointment.Date;
                     model.Day = dayOfWeekString;
-                    model.TimeAppointment = hour.ToString("H:mm");
+                    model.TimeAppointment = vm.TimeAppointment;
                     model.ReasonOfSick = vm.ReasonOfSick;
                     model.HistoryOfSick = vm.HistoryOfSick;
                     model.IdStatus = "1";
