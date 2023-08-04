@@ -147,8 +147,8 @@ namespace Appointment.Controllers
                 if (hour < timeStartHour && hour > timeEndHour) 
                 {
                     message = "Your time out of selection range";
-                    ViewData["Message"] = message;
-
+                    //ViewData["Message"] = message;
+                    TempData[SD.Warning] = message.ToString();
                     int minute = 60;
                     List<SelectListItem> duration = new List<SelectListItem>();
 
@@ -209,7 +209,9 @@ namespace Appointment.Controllers
                     string toEmail = user.Email;
 
                     await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
-
+                    message = "Successfully Submited!";
+                    //ViewData["Message"] = message;
+                    TempData[SD.Success] = message.ToString();
                     return RedirectToAction("Index", "Home");
                 }
             }
