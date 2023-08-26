@@ -1,0 +1,139 @@
+﻿@model X.PagedList.IPagedList<Appointment.ViewModels.AppointmentClinicViewModel>
+@using X.PagedList.Mvc.Core
+
+<style>
+    th {
+        text-align: center;
+        font-size: small;
+    }
+
+    .table {
+        margin-top: 10px;
+    }
+</style>
+
+<form>
+    @Html.AntiForgeryToken()
+    <div class="container-fluid">
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <center>
+                                    <h3>Appointment Patient & Doctor</h3>
+                                </center>
+                            </div>
+                        </div>
+                        <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-primary text-white">Home</a>
+                            </div>
+                            <div class="col-md-6">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" placeholder="Search" aria-label="Search" class="form-control form-control-sm" name="search" value="@ViewData["CurrentFilter"]" />
+                                    <div class="input-group-prepend">
+                                        <button type="submit" value="Search" class="btn btn-primary btn-sm" asp-action="IndexAppointmentAdmin" formmethod="get">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <table id="tableList" class="table table-bordered table-hover">
+                                    <thead class="bg-gray-light">
+                                        <tr>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-sortOrder="@ViewData["Id"]" asp-route-search="@ViewData["CurrentFilter"]">Id</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-sortOrder="@ViewData["Patient"]" asp-route-search="@ViewData["CurrentFilter"]">Patient</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-sortOrder="@ViewData["Doctor"]" asp-route-search="@ViewData["CurrentFilter"]">Docctor</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-sortOrder="@ViewData["Spesialis"]" asp-route-search="@ViewData["CurrentFilter"]">Spesialis</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-search="@ViewData["Status"]" asp-route-search="@ViewData["CurrentFilter"]">Status</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-search="@ViewData["Day"]" asp-route-search="@ViewData["CurrentFilter"]">Day / Time</a></th>
+                                            <th><a asp-action="IndexAppointmentAdmin" asp-route-search="@ViewData["DateCreated"]" asp-route-search="@ViewData["CurrentFilter"]">Date Created</a></th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@Html.DisplayFor(modelItem => item.IdAppointment)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
+                                                <td>
+                                                    @if (item.StatusName == "Waiting Approval")
+                                                    {
+                                                        <button class="btn btn-block bg-warning text-white">@item.StatusName</button>
+                                                    }
+                                                    else if (item.StatusName == "Onprogress Approval")
+                                                    {
+                                                        <button class="btn btn-block bg-primary text-white">@item.StatusName</button>
+                                                    }
+                                                    else if (item.StatusName == "Rejected Approval")
+                                                    {
+                                                        <button class="btn btn-block bg-danger text-white">@item.StatusName</button>
+                                                    }
+                                                    else if (item.StatusName == "Accepted Approval")
+                                                    {
+                                                        <button class="btn btn-block bg-success text-white">@item.StatusName</button>
+                                                    }
+                                                </td>
+                                                <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
+                                                <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                                <td width="30%" class="m-5">
+                                                    <button type="submit" value="Detail" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="DetailAppointment" asp-route-id="@item.IdAppointment" formmethod="post">
+                                                        <i class="fas fa-edit"></i>&nbsp;
+                                                        Detail
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer clearfix">
+                        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                        @Html.PagedListPager(Model, page => Url.Action("IndexAppointmentAdmin", new { page, sortOrder = ViewBag.CurrentSort, search = ViewBag.CurrentFilter }),
+                        new X.PagedList.Web.Common.PagedListRenderOptions
+                        {
+                        LiElementClasses = new string[] { "page-item" },
+                        PageClasses = new string[] { "page-link" }
+                        })
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script>
+        $(function () {
+            $('#tableList').DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

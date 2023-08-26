@@ -29,6 +29,7 @@ namespace Appointment.Controllers
         public IActionResult Index(HomeViewModel vm)
         {
             List<AppointmentClinicViewModel> itemsTransactionPatient = new List<AppointmentClinicViewModel>();
+            List<AppointmentClinicViewModel> itemsTransactionDoctor = new List<AppointmentClinicViewModel>();
             var transactionPatient = _context.AppointmentClinic.Where(i => i.UserCreated == User.Identity.Name).ToList();
 
             foreach(var data in transactionPatient)
@@ -48,9 +49,7 @@ namespace Appointment.Controllers
 
             vm.ListTransactionPatient = itemsTransactionPatient;
             ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
-            vm.UserId = _context.Users.Where(i => i.Email == User.Identity.Name).Single().Id;
-
-            if(itemsTransactionPatient.Count> 0)
+            if (itemsTransactionPatient.Count > 0)
             {
                 vm.Name = itemsTransactionPatient.FirstOrDefault().PatientName;
             }
@@ -58,7 +57,58 @@ namespace Appointment.Controllers
             {
                 vm.Name = "";
             }
-            
+
+            //Doctor below
+
+            vm.UserId = _context.Users.Where(i => i.Email == User.Identity.Name).Single().Id;            
+            var user = _context.Users.Where(i => i.UserName == User.Identity.Name).Single().Id;
+            //transaction doctor
+            var transacationDoctor = from app in _context.AppointmentClinic
+                                     join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
+                                     join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
+                                     where app.Status == "A" && app.UserIdDoctor == user
+                                     select new
+                                     {
+                                         app.IdAppointment,
+                                         app.IdSpesialis,
+                                         spes.SpesialisName,
+                                         Doctor = _context.Users.Where(u => u.Id == app.UserIdDoctor).Single().Name,
+                                         Patient = _context.Users.Where(u => u.Id == app.UserIdPatient).Single().Name,
+                                         app.Day,
+                                         app.TimeAppointment,
+                                         app.DateAppointment,
+                                         app.IdStatus,
+                                         stat.StatusName,
+                                         app.ReasonOfSick,
+                                         app.DateCreated,
+                                         app.UserCreated
+                                     };
+
+            foreach (var data in transacationDoctor)
+            {
+                AppointmentClinicViewModel item = new AppointmentClinicViewModel();
+                item.Spesialis = data.SpesialisName;
+                item.PatientName = data.Patient;
+                item.DoctorName = data.Doctor;
+                item.Day = data.Day;
+                item.TimeAppointment = data.TimeAppointment;
+                item.DateAppointment = data.DateAppointment.Date;
+                item.DateCreated = data.DateCreated;
+                item.StatusName = data.StatusName;
+                item.ReasonOfSick = data.ReasonOfSick;
+                itemsTransactionDoctor.Add(item);
+            }
+
+            if (itemsTransactionDoctor.Count > 0)
+            {
+                vm.Name = itemsTransactionDoctor.FirstOrDefault().DoctorName;
+            }
+            else
+            {
+                vm.Name = "";
+            }
+
+            vm.ListTransactionDoctor = itemsTransactionDoctor;
             return View(vm);
         }
 

@@ -2,6 +2,7 @@
 {
     public class AppointmentDoctorViewModel
     {
+        public int IdAppointment { get; set; }
         public int IdSpesialis { get; set; }
         public string UserId { get; set; }
         public string DoctorName { get; set; }
@@ -18,5 +19,6 @@
         public string Address { get; set; }
         public string Email { get; set; }
         public string Age { get; set; }
+        public string Day { get; set; }
     }
 }

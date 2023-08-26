@@ -80,7 +80,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Doctor Appointment</h5>
                             <p class="card-text">Daftar Appointment Doctor dan Patient</p>
-                            <a asp-controller="Appointment" asp-action="Index" class="btn btn-primary">Go</a>
+                            <a asp-controller="AppointmentDoctor" asp-action="IndexAppointmentAdmin" class="btn btn-primary">Go</a>
                         </div>
                     </div>
                 </div>
@@ -127,49 +127,130 @@
     </div>
 </div>
 
-@if(Model.ListTransactionPatient.Count() > 0)
+@if (User.IsInRole("Patient"))
 {
-    <div class="card mt-3 mb-3">
-        <div class="card-header">
-            <h4>Hii ... @Model.Name, this your Appointment Request</h4>
-        </div>
-        <div class="col-lg-12">
-            <div class="card-body">
-                <table id="tableList" class="table table-bordered table-hover">
-                    <thead class="bg-gray-light">
-                        <tr>
-                            <th>Spesialis</th>
-                            <th>Doctor</th>
-                            <th>Patient</th>
-                            <th>Hari / Jam</th>
-                            <th>Status</th>
-                            <th>Keluhan</th>
-                            <th>Tgl. Appointment</th>
-                            <th>Tgl. Diajukan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.ListTransactionPatient)
-                        {
+    <label>Anda adalah Patient</label>
+    @if (Model.ListTransactionPatient.Count() > 0)
+    {
+        <div class="card mt-3 mb-3">
+            <div class="card-header">
+                <h4>Hii ... @Model.Name, this your Appointment Request</h4>
+            </div>
+            <div class="col-lg-12">
+                <div class="card-body">
+                    <table id="tableList" class="table table-bordered table-hover">
+                        <thead class="bg-gray-light">
                             <tr>
-
-                                <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
-                                <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
-                                <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
-                                <td>@Html.DisplayFor(modelItem => item.StatusName)</td>
-                                <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
-                                <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
-                                <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                <th>Spesialis</th>
+                                <th>Doctor</th>
+                                <th>Patient</th>
+                                <th>Hari / Jam</th>
+                                <th>Status</th>
+                                <th>Keluhan</th>
+                                <th>Tgl. Appointment</th>
+                                <th>Tgl. Diajukan</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ListTransactionPatient)
+                            {
+                                <tr>
+
+                                    <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
+                                    <td>
+                                        @if (item.StatusName == "Waiting Approval")
+                                        {
+                                            <button class="btn btn-block bg-warning text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Onprogress Approval")
+                                        {
+                                            <button class="btn btn-block bg-primary text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Rejected Approval")
+                                        {
+                                            <button class="btn btn-block bg-danger text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Accepted Approval")
+                                        {
+                                            <button class="btn btn-block bg-success text-white">@item.StatusName</button>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
+    }
 }
-else
+@if (User.IsInRole("Doctor"))
 {
-    
+    <label>Anda adalah Dokter</label>
+    @if (Model.ListTransactionDoctor.Count() > 0)
+    {
+        <div class="card mt-3 mb-3">
+            <div class="card-header">
+                <h4>Hii ... @Model.Name, this your Appointment Request</h4>
+            </div>
+            <div class="col-lg-12">
+                <div class="card-body">
+                    <table id="tableList" class="table table-bordered table-hover">
+                        <thead class="bg-gray-light">
+                            <tr>
+                                <th>Spesialis</th>
+                                <th>Doctor</th>
+                                <th>Patient</th>
+                                <th>Hari / Jam</th>
+                                <th>Status</th>
+                                <th>Keluhan</th>
+                                <th>Tgl. Appointment</th>
+                                <th>Tgl. Diajukan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ListTransactionDoctor)
+                            {
+                                <tr>
+
+                                    <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
+                                    <td>
+                                        @if (item.StatusName == "Waiting Approval")
+                                        {
+                                            <button class="btn btn-block bg-warning text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Onprogress Approval")
+                                        {
+                                            <button class="btn btn-block bg-primary text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Rejected Approval")
+                                        {
+                                            <button class="btn btn-block bg-danger text-white">@item.StatusName</button>
+                                        }
+                                        else if (item.StatusName == "Accepted Approval")
+                                        {
+                                            <button class="btn btn-block bg-success text-white">@item.StatusName</button>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
 }

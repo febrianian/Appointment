@@ -7,5 +7,6 @@ namespace Appointment.ViewModels
         public string UserId { get; set; }
         public string Name { get; set; }
         public List<AppointmentClinicViewModel> ListTransactionPatient { get; set; }
+        public List<AppointmentClinicViewModel> ListTransactionDoctor { get; set; }
     }
 }

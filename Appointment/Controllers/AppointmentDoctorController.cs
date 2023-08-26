@@ -1,10 +1,12 @@
 ﻿using Appointment.Migrations;
 using Appointment.Models;
 using Appointment.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit;
 using System.Net;
+using X.PagedList;
 
 namespace Appointment.Controllers
 {
@@ -240,6 +242,124 @@ namespace Appointment.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Invalid day of the week.");
             }
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult IndexAppointmentAdmin(string sortOrder, string search, int? page)
+        {
+            ViewData["Id"] = String.IsNullOrEmpty(sortOrder) ? "uid_d" : "";
+            ViewData["Patient"] = sortOrder == "patient_a" ? "patient_d" : "patient_a";
+            ViewData["Doctor"] = sortOrder == "doctor_a" ? "doctor_d" : "doctor_a";
+            ViewData["Spesialis"] = sortOrder == "spesialis_a" ? "spesialis_d" : "spesialis_a";
+            ViewData["Status"] = sortOrder == "status_a" ? "status_d" : "status_a";
+            ViewData["Day"] = sortOrder == "day_a" ? "day_d" : "day_a";
+            ViewData["DateCreated"] = sortOrder == "datecreated_a" ? "datecreated_d" : "datecreated_a";
+
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            int totalCount = 0;
+
+            IList<AppointmentClinicViewModel> items = new List<AppointmentClinicViewModel>();
+            var list = from app in _context.AppointmentClinic
+                       join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
+                       join userP in _context.Users on app.UserIdPatient equals userP.Id
+                       join userD in _context.Users on app.UserIdDoctor equals userD.Id
+                       join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
+                       where app.Status == "A"
+                       select new
+                       {
+                           app.IdAppointment,
+                           app.UserModified,
+                           app.UserCreated,
+                           app.DateModified,
+                           app.DateCreated,
+                           spes.Id,
+                           spes.SpesialisName,
+                           Patient = userP.Name,
+                           Doctor = userD.Name,
+                           app.TimeAppointment,
+                           app.DateAppointment,
+                           app.Day,
+                           app.ReasonOfSick,
+                           stat.IdStatus,
+                           stat.StatusName
+                       };
+
+            if (!String.IsNullOrEmpty(search))
+            {
+                list = list.Where(s => s.SpesialisName.Contains(search)
+                || s.Patient.Contains(search)
+                || s.Doctor.Contains(search)
+                || s.Day.Contains(search)
+                || s.ReasonOfSick.Contains(search));
+            }
+
+            var sortedItems = list.ToList().OrderBy(i => i.IdAppointment);
+
+            switch (sortOrder)
+            {
+                case "uid_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.IdAppointment);
+                    break;
+                case "patient_a":
+                    sortedItems = sortedItems.OrderBy(i => i.Patient);
+                    break;
+                case "patient_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.Patient);
+                    break;
+                case "doctor_a":
+                    sortedItems = sortedItems.OrderBy(i => i.Doctor);
+                    break;
+                case "doctor_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.Doctor);
+                    break;
+                case "spesialis_a":
+                    sortedItems = sortedItems.OrderBy(i => i.SpesialisName);
+                    break;
+                case "spesialis_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.SpesialisName);
+                    break;
+                case "status_a":
+                    sortedItems = sortedItems.OrderBy(i => i.StatusName);
+                    break;
+                case "status_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.StatusName);
+                    break;
+                case "day_a":
+                    sortedItems = sortedItems.OrderBy(i => i.Day);
+                    break;
+                case "day_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.Day);
+                    break;
+                case "datecreated_a":
+                    sortedItems = sortedItems.OrderBy(i => i.DateCreated);
+                    break;
+                case "datecreated_d":
+                    sortedItems = sortedItems.OrderByDescending(i => i.DateCreated);
+                    break;
+                default:
+                    sortedItems = sortedItems.OrderBy(i => i.IdAppointment);
+                    break;
+            }
+
+            foreach (var item in list)
+            {
+                AppointmentClinicViewModel vm = new AppointmentClinicViewModel();
+                vm.IdAppointment = item.IdAppointment;
+                vm.DateAppointment= item.DateAppointment;
+                vm.Spesialis = item.SpesialisName;
+                vm.TimeAppointment = item.TimeAppointment;
+                vm.Day = item.Day;
+                vm.ReasonOfSick = item.ReasonOfSick;
+                vm.StatusName = item.StatusName;
+                vm.DateCreated = item.DateCreated;
+                vm.DoctorName = item.Doctor;
+                vm.PatientName = item.Patient;
+                items.Add(vm);
+            }
+
+            IPagedList<AppointmentClinicViewModel> pagedListData = new StaticPagedList<AppointmentClinicViewModel>(items, pageNumber, pageSize, totalCount);
+            return View("IndexAppointmentAdmin", pagedListData);
         }
     }
 }
