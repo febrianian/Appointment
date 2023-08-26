@@ -51,11 +51,11 @@ namespace Appointment.Controllers
             ViewData["DataSpesialis"] = _context.Spesialis.Where(i => i.Status == "A").ToList();
             if (itemsTransactionPatient.Count > 0)
             {
-                vm.Name = itemsTransactionPatient.FirstOrDefault().PatientName;
+                vm.NamePatient = itemsTransactionPatient.FirstOrDefault().PatientName;
             }
             else
             {
-                vm.Name = "";
+                vm.NamePatient = "";
             }
 
             //Doctor below
@@ -103,11 +103,11 @@ namespace Appointment.Controllers
 
             if (itemsTransactionDoctor.Count > 0)
             {
-                vm.Name = itemsTransactionDoctor.FirstOrDefault().DoctorName;
+                vm.NameDoctor = itemsTransactionDoctor.FirstOrDefault().DoctorName;
             }
             else
             {
-                vm.Name = "";
+                vm.NameDoctor = "";
             }
 
             vm.ListTransactionDoctor = itemsTransactionDoctor;

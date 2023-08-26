@@ -48,7 +48,8 @@ namespace Appointment.Controllers
             if (!String.IsNullOrEmpty(search))
             {
                 schedule = schedule.Where(s => s.SpesialisName.Contains(search)
-                || s.ScheduleDay.Contains(search));
+                || s.ScheduleDay.Contains(search)
+                || s.Name.Contains(search));
             }
 
             var sortedItems = schedule.ToList().OrderBy(i => i.ScheduleDay);

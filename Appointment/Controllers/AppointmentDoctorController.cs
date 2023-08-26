@@ -21,6 +21,23 @@ namespace Appointment.Controllers
             _context = context;
             _config = config;
         }
+
+        public string GenerateTicketNo(string day, string month, string year)
+        {
+            var ticketNo = "";
+            var getNo = 1;  // Initialize with 1
+
+            var getLastTicket = _context.AppointmentClinic.OrderByDescending(i => i.IdAppointment).Where(i => i.TicketNo.Substring(i.TicketNo.Length - 8, 8) == day + month + year).FirstOrDefault();
+            if (getLastTicket != null)
+            {
+                getNo = Convert.ToInt32(getLastTicket.TicketNo.Substring(0, 6)) + 1;
+            }
+
+            ticketNo = getNo.ToString("D6") + "-" + day + month + year;
+
+            return ticketNo;
+        }
+
         public async Task SentEmail(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress)
         {
             //Check configuration
@@ -82,6 +99,100 @@ namespace Appointment.Controllers
                 }
             }
         }
+
+        //public async Task<IActionResult> ListAppointment(string sortOrder, string search, int? page)
+        //{
+        //    ViewData["CurrentSort"] = sortOrder;
+        //    ViewData["CurrentFilter"] = search;
+
+        //    ViewData["Id"] = String.IsNullOrEmpty(sortOrder) ? "uid_d" : "";
+        //    ViewData["Name"] = sortOrder == "name_a" ? "name_d" : "name_a";
+        //    ViewData["Spesialis"] = sortOrder == "spesialis_a" ? "spesialis_d" : "spesialis_a";
+        //    ViewData["Status"] = sortOrder == "status_a" ? "status_d" : "status_a";
+        //    ViewData["Day"] = sortOrder == "day_a" ? "day_d" : "day_a";
+
+        //    int pageSize = 10;
+        //    int pageNumber = (page ?? 1);
+        //    int totalCount = 0;
+
+        //    IList<SpesialisScheduleViewModel> items = new List<SpesialisScheduleViewModel>();
+
+        //    var schedule = from sche in _context.SpesialisSchedule
+        //                   join spes in _context.Spesialis on sche.IdSpesialis equals spes.Id
+        //                   join user in _context.Users on sche.UserId equals user.Id
+        //                   select new
+        //                   {
+        //                       sche.IdSpesialisSchedule,
+        //                       spes.SpesialisName,
+        //                       sche.Status,
+        //                       user.Name,
+        //                       sche.ScheduleDay,
+        //                       sche.StartDate,
+        //                       sche.EndDate
+        //                   };
+
+        //    if (!String.IsNullOrEmpty(search))
+        //    {
+        //        schedule = schedule.Where(s => s.SpesialisName.Contains(search)
+        //        || s.ScheduleDay.Contains(search)
+        //        || s.Name.Contains(search));
+        //    }
+
+        //    var sortedItems = schedule.ToList().OrderBy(i => i.ScheduleDay);
+
+        //    switch (sortOrder)
+        //    {
+        //        case "uid_d":
+        //            sortedItems = sortedItems.OrderByDescending(i => i.IdSpesialisSchedule);
+        //            break;
+        //        case "name_a":
+        //            sortedItems = sortedItems.OrderBy(i => i.Name);
+        //            break;
+        //        case "name_d":
+        //            sortedItems = sortedItems.OrderByDescending(i => i.Name);
+        //            break;
+        //        case "spesialis_a":
+        //            sortedItems = sortedItems.OrderBy(i => i.SpesialisName);
+        //            break;
+        //        case "spesialis_d":
+        //            sortedItems = sortedItems.OrderByDescending(i => i.SpesialisName);
+        //            break;
+        //        case "status_a":
+        //            sortedItems = sortedItems.OrderBy(i => i.Status);
+        //            break;
+        //        case "status_d":
+        //            sortedItems = sortedItems.OrderByDescending(i => i.Status);
+        //            break;
+        //        case "day_a":
+        //            sortedItems = sortedItems.OrderBy(i => i.ScheduleDay);
+        //            break;
+        //        case "day_d":
+        //            sortedItems = sortedItems.OrderByDescending(i => i.ScheduleDay);
+        //            break;
+        //        default:
+        //            sortedItems = sortedItems.OrderBy(i => i.IdSpesialisSchedule);
+        //            break;
+        //    }
+
+        //    totalCount = schedule.Count();
+
+        //    foreach (var itemusr in sortedItems.ToPagedList(pageNumber, pageSize))
+        //    {
+        //        SpesialisScheduleViewModel item = new SpesialisScheduleViewModel();
+        //        item.IdSpesialisSchedule = itemusr.IdSpesialisSchedule;
+        //        item.Name = itemusr.Name;
+        //        item.Status = itemusr.Status;
+        //        item.SpesialisName = itemusr.SpesialisName;
+        //        item.ScheduleDay = itemusr.ScheduleDay;
+        //        item.StartDate = itemusr.StartDate.ToString("HH:mm");
+        //        item.EndDate = itemusr.EndDate.ToString("HH:mm");
+
+        //        items.Add(item);
+        //    }
+
+        //    IPagedList<SpesialisScheduleViewModel> pagedListData = new StaticPagedList<SpesialisScheduleViewModel>(items, pageNumber, pageSize, totalCount);
+        //    return View("Index", pagedListData);
+        //}
         public IActionResult Index(AppointmentDoctorViewModel vm, int idSpesialis, string userId)
         {
             int minute = 60;
@@ -306,6 +417,7 @@ namespace Appointment.Controllers
                            app.UserCreated,
                            app.DateModified,
                            app.DateCreated,
+                           app.IdStatus,
                            spes.Id,
                            spes.SpesialisName,
                            Patient = userP.Name,
@@ -314,7 +426,6 @@ namespace Appointment.Controllers
                            app.DateAppointment,
                            app.Day,
                            app.ReasonOfSick,
-                           stat.IdStatus,
                            stat.StatusName
                        };
 
@@ -383,6 +494,7 @@ namespace Appointment.Controllers
                 vm.Spesialis = item.SpesialisName;
                 vm.TimeAppointment = item.TimeAppointment;
                 vm.Day = item.Day;
+                vm.IdStatus = item.IdStatus;
                 vm.ReasonOfSick = item.ReasonOfSick;
                 vm.StatusName = item.StatusName;
                 vm.DateCreated = item.DateCreated;
@@ -395,7 +507,7 @@ namespace Appointment.Controllers
             return View("IndexAppointmentAdmin", pagedListData);
         }
 
-        [Authorize(Roles = "Doctor")]
+        [Authorize(Roles = "Admin, Doctor")]
         public async Task<IActionResult> Proccess(int idAppointment)
         {
             var transaction = (from app in _context.AppointmentClinic
@@ -436,15 +548,20 @@ namespace Appointment.Controllers
             return View(vm);
         }
 
+        [Authorize(Roles = "Admin, Doctor")]
         [HttpPost]
         public async Task<IActionResult> ApproveRequest(AppointmentClinicViewModel vm)
         {
             var message = "";
-
+            var day = vm.DateAppointment.ToString("dd");
+            var month = vm.DateAppointment.ToString("MM");
+            var year = vm.DateAppointment.ToString("yyyy");
             var transaction = _context.AppointmentClinic.Where(i => i.IdAppointment == vm.IdAppointment).Single();
 
             //update status
             transaction.IdStatus = "4";
+            transaction.TicketNo = GenerateTicketNo(day, month, year);
+            transaction.DoctorNote = vm.DoctorNote;
             transaction.DateModified = DateTime.Now;
             transaction.UserModified = User.Identity.Name;
             _context.Update(transaction);
@@ -477,6 +594,7 @@ namespace Appointment.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize(Roles = "Admin, Doctor")]
         [HttpPost]
         public async Task<IActionResult> RejectRequest(AppointmentClinicViewModel vm)
         {

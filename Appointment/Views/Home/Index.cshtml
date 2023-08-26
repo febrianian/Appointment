@@ -45,7 +45,7 @@
             <h4>Dokter Setup</h4>
             <hr>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <h5 class="card-header">Spesialis</h5>
                         <div class="card-body">
@@ -55,7 +55,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <h5 class="card-header">Schedule</h5>
                         <div class="card-body">
@@ -65,9 +65,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
                     <div class="card">
-                        <h5 class="card-header">Transaction</h5>
+                        <h5 class="card-header">Status Approval</h5>
                         <div class="card-body">
                             <h5 class="card-title">Status Transaction</h5>
                             <p class="card-text">Daftar Status Transaction untuk progress transaksi berlangung antara Patient dan Dokter</p>
@@ -75,7 +77,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <h5 class="card-header">Appointment</h5>
                         <div class="card-body">
@@ -100,41 +102,40 @@
     </div>
 </div>
 
-<div class="card">
-    <div class="col-lg-12">
-        <div class="card-body">
-            <h4>Dokter Available</h4>
-            <hr>
-            <div class="card-container d-flex flex-row flex-wrap">
-                @foreach (var data in ViewBag.DataSpesialis)
-                {
-                    <div class="card col-md-6 mb-3 p-1">
-                        <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <img src="@data.ImagesPath" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;" />
-                                </div>
-                                <div class="col-md-8">
-                                    <p class="card-text">@data.Description</p>
-                                    <a asp-controller="Home" asp-action="DashboardSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
+@if (User.IsInRole("Patient"))
+{
+
+    <div class="card">
+        <div class="card-header"><h4>Dokter Available</h4></div>
+        <div class="col-lg-12">
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var data in ViewBag.DataSpesialis)
+                    {
+                        <div class="col-md-6 mb-6">
+                            <h5 class="card-header bg-info text-white">@data.SpesialisName</h5>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="@data.ImagesPath" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p class="card-text">@data.Description</p>
+                                        <a asp-controller="Home" asp-action="DashboardSpesialis" asp-route-idSpesialis="@data.Id">Make Appointment</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-@if (User.IsInRole("Patient"))
-{
     @if (Model.ListTransactionPatient.Count() > 0)
     {
         <div class="card mt-3 mb-3">
             <div class="card-header">
-                <h4>Hii ... @Model.Name, this your Appointment Request</h4>
+                <h4>Hii ... @Model.NamePatient, this your Appointment Request</h4>
             </div>
             <div class="col-lg-12">
                 <div class="card-body">
@@ -179,8 +180,8 @@
                                         }
                                     </td>
                                     <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                    <td>@item.DateAppointment.ToString("dd MMMM yyyy")</td>
+                                    <td>@item.DateCreated.ToString("dd MMMM yyyy")</td>
                                 </tr>
                             }
                         </tbody>
@@ -196,7 +197,7 @@
     {
         <div class="card mt-3 mb-3">
             <div class="card-header">
-                <h4>Hii ... @Model.Name, this your Appointment Request</h4>
+                <h4>Hii ... @Model.NameDoctor, this your Appointment Request</h4>
             </div>
             <div class="col-lg-12">
                 <div class="card-body">
@@ -243,10 +244,10 @@
                                         }
                                     </td>
                                     <td>@Html.DisplayFor(modelItem => itemDoc.ReasonOfSick)</td>
-                                    <td>@Html.DisplayFor(modelItem => itemDoc.DateAppointment)</td>
-                                    <td>@Html.DisplayFor(modelItem => itemDoc.DateCreated)</td>
-                                    @if(itemDoc.IdStatus == "3" || itemDoc.IdStatus == "4")
-                                    {                                        
+                                    <td>@itemDoc.DateAppointment.ToString("dd MMMM yyyy"))</td>
+                                    <td>@itemDoc.DateCreated.ToString("dd MMMM yyyy"))</td>
+                                    @if (itemDoc.IdStatus == "3" || itemDoc.IdStatus == "4")
+                                    {
                                         <td width="30%" class="m-5">
                                             <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment" class="btn btn-primary disabled">Proccess</a>
                                         </td>

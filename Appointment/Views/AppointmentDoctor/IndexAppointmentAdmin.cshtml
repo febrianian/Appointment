@@ -91,12 +91,38 @@
                                                 </td>
                                                 <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
                                                 <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                                @if (item.IdStatus == "3" || item.IdStatus == "4")
+                                                {
+                                                    <td width="30%" class="m-5">
+                                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary disabled">Proccess</a>
+                                                        <a asp-controller="AppointmentDoctor" asp-action="DetailsAppointment" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary">Details</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td width="30%" class="m-5">
+                                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary">Proccess</a>
+                                                        <a asp-controller="AppointmentDoctor" asp-action="DetailsAppointment" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary">Details</a>
+                                                    </td>
+                                                }                                               
+                                                @*@if (item.IdStatus == "3" || item.IdStatus == "4")
+                                                {
+                                                    <td width="30%" class="m-5">
+                                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary disabled">Proccess</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td width="30%" class="m-5">
+                                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@item.IdAppointment" class="btn btn-primary">Proccess</a>
+                                                    </td>
+                                                }
                                                 <td width="30%" class="m-5">
-                                                    <button type="submit" value="Detail" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="DetailAppointment" asp-route-id="@item.IdAppointment" formmethod="post">
+                                                    <button type="submit" value="Detail" class="btn btn-primary btn-link text-white" style="text-align:center" asp-action="Details" asp-route-idAppointment="@item.IdAppointment" formmethod="post">
                                                         <i class="fas fa-edit"></i>&nbsp;
                                                         Detail
                                                     </button>
-                                                </td>
+                                                </td>*@
                                             </tr>
                                         }
                                     </tbody>
