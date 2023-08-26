@@ -4,6 +4,7 @@ using Appointment.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using System.Net;
 using X.PagedList;
@@ -89,9 +90,9 @@ namespace Appointment.Controllers
             for (int i = 1; i <= 24; i++)
             {
                 duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":00" });
-                minute = minute + 30;
-                duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
-                minute = minute + 30;
+                //minute = minute + 30;
+                //duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
+                //minute = minute + 30;
             }
 
             ViewData["Hours"] = new SelectList(duration, "Value", "Text");
@@ -109,7 +110,7 @@ namespace Appointment.Controllers
 
             DateTime currentDate = DateTime.Today;
             int age = currentDate.Year - user.BirthDate.Year;
-            
+
             if (user.BirthDate.Date > currentDate.AddYears(-age))
             {
                 age--;
@@ -126,7 +127,7 @@ namespace Appointment.Controllers
             var message = "";
             DateTime inputDateTime = vm.DateAppointment.Date;
             DayOfWeek dayOfWeek = inputDateTime.DayOfWeek;
-            string dayOfWeekString = GetBahasaIndonesiaDayOfWeek(dayOfWeek);            
+            string dayOfWeekString = GetBahasaIndonesiaDayOfWeek(dayOfWeek);
 
             var schedule = _context.SpesialisSchedule.Where(i => i.IdSpesialis == vm.IdSpesialis && i.UserId == vm.UserId && i.Status == "A");
             DateTime selectTime = DateTime.ParseExact(vm.TimeAppointment, "H:mm", System.Globalization.CultureInfo.InvariantCulture);
@@ -146,7 +147,7 @@ namespace Appointment.Controllers
                 int timeStartHour = startTime.Hour; // 6
                 int timeEndHour = endTime.Hour; // 16              
 
-                if (hour < timeStartHour && hour > timeEndHour) 
+                if (hour < timeStartHour && hour > timeEndHour)
                 {
                     message = "Your time out of selection range";
                     //ViewData["Message"] = message;
@@ -157,9 +158,9 @@ namespace Appointment.Controllers
                     for (int i = 1; i <= 24; i++)
                     {
                         duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":00" });
-                        minute = minute + 30;
-                        duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
-                        minute = minute + 30;
+                        //minute = minute + 30;
+                        //duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
+                        //minute = minute + 30;
                     }
 
                     ViewData["Hours"] = new SelectList(duration, "Value", "Text");
@@ -169,52 +170,84 @@ namespace Appointment.Controllers
 
                 AppointmentClinic model = new AppointmentClinic();
 
-                using(var transSql = _context.Database.BeginTransaction()) 
+                using (var transSql = _context.Database.BeginTransaction())
                 {
-                    model.IdSpesialis = vm.IdSpesialis;
-                    model.UserIdPatient = user.Id;
-                    model.UserIdDoctor = doctor.Id;
-                    model.Age = vm.Age;
-                    model.DateAppointment = vm.DateAppointment.Date;
-                    model.Day = dayOfWeekString;
-                    model.TimeAppointment = vm.TimeAppointment;
-                    model.ReasonOfSick = vm.ReasonOfSick;
-                    model.HistoryOfSick = vm.HistoryOfSick;
-                    model.IdStatus = "1";
-                    model.Status = "A";
-                    model.DateCreated = DateTime.Now;
-                    model.UserCreated = User.Identity.Name;
+                    var isDuplicateAppointment = await _context.AppointmentClinic
+                     .AnyAsync(item =>
+                         item.DateAppointment.Date == vm.DateAppointment.Date &&
+                         item.TimeAppointment == vm.TimeAppointment &&
+                         item.Status == "A" && item.IdSpesialis == vm.IdSpesialis);
 
-                    _context.Add(model);
-                    await _context.SaveChangesAsync();
-                    transSql.Commit();
+                    if (isDuplicateAppointment == true)
+                    {
+                        message = "Time Already Booked in another transaction";
+                        TempData[SD.Success] = message.ToString();
 
-                    string subject = "Appoitment Successfully Submited !";
-                    string htmlBody = "Details are as follows:<br/><br/>";
+                        int minute = 60;
+                        List<SelectListItem> duration = new List<SelectListItem>();
 
-                    var spesialis = _context.Spesialis.Where(x => x.Id == model.IdSpesialis).Single().SpesialisName;
+                        for (int i = 1; i <= 24; i++)
+                        {
+                            duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":00" });
+                            //minute = minute + 30;
+                            //duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
+                            //minute = minute + 30;
+                        }
 
-                    htmlBody += "<table>";
-                    htmlBody += "<tr><td>Spesialis</td><td>: " + spesialis + "</td></tr>";
-                    htmlBody += "<tr><td>Doctor</td><td>: " + doctor.Name + "</td></tr>";
-                    htmlBody += "<tr><td>Tanggal Konsultasi</td><td>: " + model.DateAppointment.Date.ToString("dd MMMM yyyy") + "</td></tr>";
-                    htmlBody += "<tr><td>Hari / Waktu</td><td>: " + model.Day + " / " + model.TimeAppointment + "</td></tr>";
-                    htmlBody += "<tr><td>Keluhan</td><td>: " + model.ReasonOfSick + "</td></tr>";                    
-                    htmlBody += "</table><br/><br/>";
-                    htmlBody += "<br/><br/>";
-                    htmlBody += "Mohon untuk datang minimal 15 menit sebelum waktu yang sudah ditentukan, terima kasih.";
-                    htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+                        vm.DoctorName = doctor.Name;
+                        vm.Spesialis = _context.Spesialis.Where(i => i.Id == vm.IdSpesialis).Single().SpesialisName;
 
-                    string from = "Appointment Clinic";
-                    string status = "Success";
-                    string toTitle = user.Email;
-                    string toEmail = user.Email;
+                        ViewData["Hours"] = new SelectList(duration, "Value", "Text");
 
-                    await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
-                    message = "Successfully Submited!";
-                    //ViewData["Message"] = message;
-                    TempData[SD.Success] = message.ToString();
-                    return RedirectToAction("Index", "Home");
+                        return View("Index", vm);
+                    }
+                    else 
+                    {
+                        model.IdSpesialis = vm.IdSpesialis;
+                        model.UserIdPatient = user.Id;
+                        model.UserIdDoctor = doctor.Id;
+                        model.Age = vm.Age;
+                        model.DateAppointment = vm.DateAppointment.Date;
+                        model.Day = dayOfWeekString;
+                        model.TimeAppointment = vm.TimeAppointment;
+                        model.ReasonOfSick = vm.ReasonOfSick;
+                        model.HistoryOfSick = vm.HistoryOfSick;
+                        model.IdStatus = "1";
+                        model.Status = "A";
+                        model.DateCreated = DateTime.Now;
+                        model.UserCreated = User.Identity.Name;
+
+                        _context.Add(model);
+                        await _context.SaveChangesAsync();
+                        transSql.Commit();
+
+                        string subject = "Appoitment Successfully Submited !";
+                        string htmlBody = "Details are as follows:<br/><br/>";
+
+                        var spesialis = _context.Spesialis.Where(x => x.Id == model.IdSpesialis).Single().SpesialisName;
+
+                        htmlBody += "<table>";
+                        htmlBody += "<tr><td>Spesialis</td><td>: " + spesialis + "</td></tr>";
+                        htmlBody += "<tr><td>Doctor</td><td>: " + doctor.Name + "</td></tr>";
+                        htmlBody += "<tr><td>Tanggal Konsultasi</td><td>: " + model.DateAppointment.Date.ToString("dd MMMM yyyy") + "</td></tr>";
+                        htmlBody += "<tr><td>Hari / Waktu</td><td>: " + model.Day + " / " + model.TimeAppointment + "</td></tr>";
+                        htmlBody += "<tr><td>Keluhan</td><td>: " + model.ReasonOfSick + "</td></tr>";
+                        htmlBody += "</table><br/><br/>";
+                        htmlBody += "<br/><br/>";
+                        htmlBody += "Mohon untuk datang minimal 15 menit sebelum waktu yang sudah ditentukan, terima kasih.";
+                        htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+
+                        string from = "Appointment Clinic";
+                        string status = "Success";
+                        string toTitle = user.Email;
+                        string toEmail = user.Email;
+
+                        await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+                        message = "Successfully Submited!";
+                        //ViewData["Message"] = message;
+                        TempData[SD.Success] = message.ToString();
+                        return RedirectToAction("Index", "Home");
+                    }                    
                 }
             }
 
@@ -346,7 +379,7 @@ namespace Appointment.Controllers
             {
                 AppointmentClinicViewModel vm = new AppointmentClinicViewModel();
                 vm.IdAppointment = item.IdAppointment;
-                vm.DateAppointment= item.DateAppointment;
+                vm.DateAppointment = item.DateAppointment;
                 vm.Spesialis = item.SpesialisName;
                 vm.TimeAppointment = item.TimeAppointment;
                 vm.Day = item.Day;
@@ -366,27 +399,27 @@ namespace Appointment.Controllers
         public async Task<IActionResult> Proccess(int idAppointment)
         {
             var transaction = (from app in _context.AppointmentClinic
-                                     join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
-                                     join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
-                                     where app.Status == "A" && app.IdAppointment == idAppointment
-                                     select new
-                                     {
-                                         app.IdAppointment,
-                                         app.IdSpesialis,
-                                         spes.SpesialisName,
-                                         app.HistoryOfSick,
-                                         app.Age,
-                                         Doctor = _context.Users.Where(u => u.Id == app.UserIdDoctor).Single().Name,
-                                         Patient = _context.Users.Where(u => u.Id == app.UserIdPatient).Single().Name,
-                                         app.Day,
-                                         app.TimeAppointment,
-                                         app.DateAppointment,
-                                         app.IdStatus,
-                                         stat.StatusName,
-                                         app.ReasonOfSick,
-                                         app.DateCreated,
-                                         app.UserCreated
-                                     }).Single();
+                               join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
+                               join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
+                               where app.Status == "A" && app.IdAppointment == idAppointment
+                               select new
+                               {
+                                   app.IdAppointment,
+                                   app.IdSpesialis,
+                                   spes.SpesialisName,
+                                   app.HistoryOfSick,
+                                   app.Age,
+                                   Doctor = _context.Users.Where(u => u.Id == app.UserIdDoctor).Single().Name,
+                                   Patient = _context.Users.Where(u => u.Id == app.UserIdPatient).Single().Name,
+                                   app.Day,
+                                   app.TimeAppointment,
+                                   app.DateAppointment,
+                                   app.IdStatus,
+                                   stat.StatusName,
+                                   app.ReasonOfSick,
+                                   app.DateCreated,
+                                   app.UserCreated
+                               }).Single();
 
             AppointmentClinicViewModel vm = new AppointmentClinicViewModel();
             vm.IdAppointment = transaction.IdAppointment;
@@ -416,7 +449,7 @@ namespace Appointment.Controllers
             transaction.UserModified = User.Identity.Name;
             _context.Update(transaction);
             _context.SaveChanges();
-           
+
             var spesialis = _context.Spesialis.Where(x => x.Id == transaction.IdSpesialis).Single().SpesialisName;
             string subject = "Appoitment " + spesialis;
             string htmlBody = "Details are as follows:<br/><br/>";
@@ -484,7 +517,7 @@ namespace Appointment.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-        
+
         public async Task<IActionResult> DetailsAppointment(int idAppointment)
         {
             var transaction = (from app in _context.AppointmentClinic
