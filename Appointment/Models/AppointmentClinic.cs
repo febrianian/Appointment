@@ -21,5 +21,7 @@ namespace Appointment.Models
         public DateTime DateCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime DateModified { get; set; }
+        public string TicketNo { get; set; }
+        public string DoctorNote { get; set; }
     }
 }

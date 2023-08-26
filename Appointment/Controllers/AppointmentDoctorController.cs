@@ -435,7 +435,7 @@ namespace Appointment.Controllers
             string status = "Success";
             string toTitle = transaction.UserCreated;
             string toEmail = transaction.UserCreated;
-
+            transaction.DoctorNote = vm.DoctorName;
             await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
             message = "Successfully Submited!";
             //ViewData["Message"] = message;
@@ -454,6 +454,7 @@ namespace Appointment.Controllers
             transaction.IdStatus = "3";
             transaction.DateModified = DateTime.Now;
             transaction.UserModified = User.Identity.Name;
+            transaction.DoctorNote = vm.DoctorName;
             _context.Update(transaction);
             _context.SaveChanges();
 
@@ -482,6 +483,48 @@ namespace Appointment.Controllers
             TempData[SD.Success] = message.ToString();
 
             return RedirectToAction("Index", "Home");
+        }
+        
+        public async Task<IActionResult> DetailsAppointment(int idAppointment)
+        {
+            var transaction = (from app in _context.AppointmentClinic
+                               join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
+                               join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
+                               where app.Status == "A" && app.IdAppointment == idAppointment
+                               select new
+                               {
+                                   app.IdAppointment,
+                                   app.IdSpesialis,
+                                   spes.SpesialisName,
+                                   app.HistoryOfSick,
+                                   app.DoctorNote,
+                                   app.Age,
+                                   Doctor = _context.Users.Where(u => u.Id == app.UserIdDoctor).Single().Name,
+                                   Patient = _context.Users.Where(u => u.Id == app.UserIdPatient).Single().Name,
+                                   app.Day,
+                                   app.TimeAppointment,
+                                   app.DateAppointment,
+                                   app.IdStatus,
+                                   stat.StatusName,
+                                   app.ReasonOfSick,
+                                   app.DateCreated,
+                                   app.UserCreated
+                               }).Single();
+
+            AppointmentClinicViewModel vm = new AppointmentClinicViewModel();
+            vm.IdAppointment = transaction.IdAppointment;
+            vm.Spesialis = transaction.SpesialisName;
+            vm.PatientName = transaction.Patient;
+            vm.Day = transaction.Day;
+            vm.Age = transaction.Age;
+            vm.TimeAppointment = transaction.TimeAppointment;
+            vm.DateAppointment = transaction.DateAppointment;
+            vm.StatusName = transaction.StatusName;
+            vm.ReasonOfSick = transaction.ReasonOfSick;
+            vm.HistoryOfSick = transaction.HistoryOfSick;
+            vm.DateCreated = transaction.DateCreated;
+            vm.DoctorNote = transaction.DoctorNote;
+            return View(vm);
         }
     }
 }

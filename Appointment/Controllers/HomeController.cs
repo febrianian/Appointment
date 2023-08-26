@@ -89,6 +89,7 @@ namespace Appointment.Controllers
                 AppointmentClinicViewModel item = new AppointmentClinicViewModel();
                 item.IdAppointment = data.IdAppointment;
                 item.Spesialis = data.SpesialisName;
+                item.IdStatus = data.IdStatus;
                 item.PatientName = data.Patient;
                 item.DoctorName = data.Doctor;
                 item.Day = data.Day;

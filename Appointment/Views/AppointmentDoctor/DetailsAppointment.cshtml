@@ -28,7 +28,7 @@
                             <span asp-validation-for="TimeAppointment" class="text-danger"></span>
                         </div>
                     </div>
-                     <div class="form-group row">
+                    <div class="form-group row">
                         <label class="col-md-2" asp-for="Age">Age</label>
                         <div class=" col-md-3">
                             <input asp-for="Age" readonly class="form-control" />
@@ -59,18 +59,12 @@
                     <div class="form-group row">
                         <label class="col-md-2" asp-for="DoctorNote">Note</label>
                         <div class=" col-md-10">
-                            <textarea rows="5" asp-for="DoctorNote" class="form-control"></textarea>
+                            <textarea rows="5" asp-for="DoctorNote" readonly class="form-control"></textarea>
                             <span asp-validation-for="DoctorNote" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-block float-left form-control col-md-2">Back</a>
-                        <div class=" col-md-5">
-                            <input type="submit" value="Approve Request" asp-controller="AppointmentDoctor" asp-action="ApproveRequest" asp-route-idAppointment="@Model.IdAppointment" class="btn btn-success form-control text-white" />
-                        </div>
-                        <div class=" col-md-5">
-                            <input type="submit" value="Reject Request" asp-controller="AppointmentDoctor" asp-action="RejectRequest" asp-route-idAppointment="@Model.IdAppointment" class="btn btn-danger form-control text-white" />
-                        </div>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-block float-left form-control col-md-2">Back</a>                                              
                     </div>
                     @*<label>@ViewBag.Message</label>*@
                 </div>

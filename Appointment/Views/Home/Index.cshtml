@@ -245,12 +245,21 @@
                                     <td>@Html.DisplayFor(modelItem => itemDoc.ReasonOfSick)</td>
                                     <td>@Html.DisplayFor(modelItem => itemDoc.DateAppointment)</td>
                                     <td>@Html.DisplayFor(modelItem => itemDoc.DateCreated)</td>
+                                    @if(itemDoc.IdStatus == "3" || itemDoc.IdStatus == "4")
+                                    {                                        
+                                        <td width="30%" class="m-5">
+                                            <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment" class="btn btn-primary disabled">Proccess</a>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td width="30%" class="m-5">
+                                            <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment" class="btn btn-primary">Proccess</a>
+                                        </td>
+                                    }
+
                                     <td width="30%" class="m-5">
-                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment">here</a>
-                                        <button type="submit" value="Proccess" class="btn btn-primary btn-link text-white" style="text-align:center" asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment">
-                                            <i class="fas fa-edit"></i>&nbsp;
-                                            Proccess
-                                        </button>
+                                        <a asp-controller="AppointmentDoctor" asp-action="DetailsAppointment" asp-route-idAppointment="@itemDoc.IdAppointment" class="btn btn-primary">Details</a>
                                     </td>
                                 </tr>
                             }

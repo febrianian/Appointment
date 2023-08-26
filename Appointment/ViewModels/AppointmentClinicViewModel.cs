@@ -5,6 +5,7 @@
         public int IdAppointment { get; set; }
         public int IdSpesialis { get; set; }
         public string Spesialis { get; set; }
+        public string DoctorNote { get; set; }
         public string UserIdPatient { get; set; }
         public string DoctorName { get; set; }
         public string UserIdDoctor { get; set; }
