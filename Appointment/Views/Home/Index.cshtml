@@ -3,6 +3,7 @@
     ViewData["Title"] = "Home Page";
 }
 <input type="hidden" asp-for="UserId" />
+<input type="hidden" asp-for="IdAppointment" />
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
@@ -129,7 +130,6 @@
 
 @if (User.IsInRole("Patient"))
 {
-    <label>Anda adalah Patient</label>
     @if (Model.ListTransactionPatient.Count() > 0)
     {
         <div class="card mt-3 mb-3">
@@ -192,7 +192,6 @@
 }
 @if (User.IsInRole("Doctor"))
 {
-    <label>Anda adalah Dokter</label>
     @if (Model.ListTransactionDoctor.Count() > 0)
     {
         <div class="card mt-3 mb-3">
@@ -204,6 +203,7 @@
                     <table id="tableList" class="table table-bordered table-hover">
                         <thead class="bg-gray-light">
                             <tr>
+                                <th>Id</th>
                                 <th>Spesialis</th>
                                 <th>Doctor</th>
                                 <th>Patient</th>
@@ -212,38 +212,46 @@
                                 <th>Keluhan</th>
                                 <th>Tgl. Appointment</th>
                                 <th>Tgl. Diajukan</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.ListTransactionDoctor)
+                            @foreach (var itemDoc in Model.ListTransactionDoctor)
                             {
                                 <tr>
-
-                                    <td>@Html.DisplayFor(modelItem => item.Spesialis)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DoctorName)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.PatientName)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Day) / @Html.DisplayFor(modelItem => item.TimeAppointment)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.IdAppointment)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.Spesialis)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.DoctorName)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.PatientName)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.Day) / @Html.DisplayFor(modelItem => itemDoc.TimeAppointment)</td>
                                     <td>
-                                        @if (item.StatusName == "Waiting Approval")
+                                        @if (itemDoc.StatusName == "Waiting Approval")
                                         {
-                                            <button class="btn btn-block bg-warning text-white">@item.StatusName</button>
+                                            <button class="btn btn-block bg-warning text-white">@itemDoc.StatusName</button>
                                         }
-                                        else if (item.StatusName == "Onprogress Approval")
+                                        else if (itemDoc.StatusName == "Onprogress Approval")
                                         {
-                                            <button class="btn btn-block bg-primary text-white">@item.StatusName</button>
+                                            <button class="btn btn-block bg-primary text-white">@itemDoc.StatusName</button>
                                         }
-                                        else if (item.StatusName == "Rejected Approval")
+                                        else if (itemDoc.StatusName == "Rejected Approval")
                                         {
-                                            <button class="btn btn-block bg-danger text-white">@item.StatusName</button>
+                                            <button class="btn btn-block bg-danger text-white">@itemDoc.StatusName</button>
                                         }
-                                        else if (item.StatusName == "Accepted Approval")
+                                        else if (itemDoc.StatusName == "Accepted Approval")
                                         {
-                                            <button class="btn btn-block bg-success text-white">@item.StatusName</button>
+                                            <button class="btn btn-block bg-success text-white">@itemDoc.StatusName</button>
                                         }
                                     </td>
-                                    <td>@Html.DisplayFor(modelItem => item.ReasonOfSick)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DateAppointment)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DateCreated)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.ReasonOfSick)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.DateAppointment)</td>
+                                    <td>@Html.DisplayFor(modelItem => itemDoc.DateCreated)</td>
+                                    <td width="30%" class="m-5">
+                                        <a asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment">here</a>
+                                        <button type="submit" value="Proccess" class="btn btn-primary btn-link text-white" style="text-align:center" asp-controller="AppointmentDoctor" asp-action="Proccess" asp-route-idAppointment="@itemDoc.IdAppointment">
+                                            <i class="fas fa-edit"></i>&nbsp;
+                                            Proccess
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         </tbody>

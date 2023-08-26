@@ -361,5 +361,127 @@ namespace Appointment.Controllers
             IPagedList<AppointmentClinicViewModel> pagedListData = new StaticPagedList<AppointmentClinicViewModel>(items, pageNumber, pageSize, totalCount);
             return View("IndexAppointmentAdmin", pagedListData);
         }
+
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> Proccess(int idAppointment)
+        {
+            var transaction = (from app in _context.AppointmentClinic
+                                     join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
+                                     join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
+                                     where app.Status == "A" && app.IdAppointment == idAppointment
+                                     select new
+                                     {
+                                         app.IdAppointment,
+                                         app.IdSpesialis,
+                                         spes.SpesialisName,
+                                         app.HistoryOfSick,
+                                         app.Age,
+                                         Doctor = _context.Users.Where(u => u.Id == app.UserIdDoctor).Single().Name,
+                                         Patient = _context.Users.Where(u => u.Id == app.UserIdPatient).Single().Name,
+                                         app.Day,
+                                         app.TimeAppointment,
+                                         app.DateAppointment,
+                                         app.IdStatus,
+                                         stat.StatusName,
+                                         app.ReasonOfSick,
+                                         app.DateCreated,
+                                         app.UserCreated
+                                     }).Single();
+
+            AppointmentClinicViewModel vm = new AppointmentClinicViewModel();
+            vm.IdAppointment = transaction.IdAppointment;
+            vm.Spesialis = transaction.SpesialisName;
+            vm.PatientName = transaction.Patient;
+            vm.Day = transaction.Day;
+            vm.Age = transaction.Age;
+            vm.TimeAppointment = transaction.TimeAppointment;
+            vm.DateAppointment = transaction.DateAppointment;
+            vm.StatusName = transaction.StatusName;
+            vm.ReasonOfSick = transaction.ReasonOfSick;
+            vm.HistoryOfSick = transaction.HistoryOfSick;
+            vm.DateCreated = transaction.DateCreated;
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveRequest(AppointmentClinicViewModel vm)
+        {
+            var message = "";
+
+            var transaction = _context.AppointmentClinic.Where(i => i.IdAppointment == vm.IdAppointment).Single();
+
+            //update status
+            transaction.IdStatus = "4";
+            transaction.DateModified = DateTime.Now;
+            transaction.UserModified = User.Identity.Name;
+            _context.Update(transaction);
+            _context.SaveChanges();
+           
+            var spesialis = _context.Spesialis.Where(x => x.Id == transaction.IdSpesialis).Single().SpesialisName;
+            string subject = "Appoitment " + spesialis;
+            string htmlBody = "Details are as follows:<br/><br/>";
+            htmlBody += "<table>";
+            htmlBody += "<tr><td>Spesialis</td><td>: " + spesialis + "</td></tr>";
+            htmlBody += "<tr><td>Doctor</td><td>: " + _context.Users.Where(i => i.Id == transaction.UserIdDoctor).Single().Name + "</td></tr>";
+            htmlBody += "<tr><td>Tanggal Konsultasi</td><td>: " + transaction.DateAppointment.Date.ToString("dd MMMM yyyy") + "</td></tr>";
+            htmlBody += "<tr><td>Hari / Waktu</td><td>: " + transaction.Day + " / " + transaction.TimeAppointment + "</td></tr>";
+            htmlBody += "<tr><td>Keluhan</td><td>: " + transaction.ReasonOfSick + "</td></tr>";
+            htmlBody += "<tr><td>Status</td><td>: " + _context.StatusTransaction.Where(i => i.IdStatus == transaction.IdStatus).Single().StatusName + "</td></tr>";
+            htmlBody += "</table><br/><br/>";
+            htmlBody += "<br/><br/>";
+            htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+
+            string from = "Appointment Clinic";
+            string status = "Success";
+            string toTitle = transaction.UserCreated;
+            string toEmail = transaction.UserCreated;
+
+            await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+            message = "Successfully Submited!";
+            //ViewData["Message"] = message;
+            TempData[SD.Success] = message.ToString();
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectRequest(AppointmentClinicViewModel vm)
+        {
+            var message = "";
+            var transaction = _context.AppointmentClinic.Where(i => i.IdAppointment == vm.IdAppointment).Single();
+
+            //update status
+            transaction.IdStatus = "3";
+            transaction.DateModified = DateTime.Now;
+            transaction.UserModified = User.Identity.Name;
+            _context.Update(transaction);
+            _context.SaveChanges();
+
+            var spesialis = _context.Spesialis.Where(x => x.Id == transaction.IdSpesialis).Single().SpesialisName;
+            string subject = "Appoitment " + spesialis;
+            string htmlBody = "Details are as follows:<br/><br/>";
+            htmlBody += "<table>";
+            htmlBody += "<tr><td>Spesialis</td><td>: " + spesialis + "</td></tr>";
+            htmlBody += "<tr><td>Doctor</td><td>: " + _context.Users.Where(i => i.Id == transaction.UserIdDoctor).Single().Name + "</td></tr>";
+            htmlBody += "<tr><td>Tanggal Konsultasi</td><td>: " + transaction.DateAppointment.Date.ToString("dd MMMM yyyy") + "</td></tr>";
+            htmlBody += "<tr><td>Hari / Waktu</td><td>: " + transaction.Day + " / " + transaction.TimeAppointment + "</td></tr>";
+            htmlBody += "<tr><td>Keluhan</td><td>: " + transaction.ReasonOfSick + "</td></tr>";
+            htmlBody += "<tr><td>Status</td><td>: " + _context.StatusTransaction.Where(i => i.IdStatus == transaction.IdStatus).Single().StatusName + "</td></tr>";
+            htmlBody += "</table><br/><br/>";
+            htmlBody += "<br/><br/>";
+            htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+
+            string from = "Appointment Clinic";
+            string status = "Success";
+            string toTitle = transaction.UserCreated;
+            string toEmail = transaction.UserCreated;
+
+            await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+            message = "Successfully Submited!";
+            //ViewData["Message"] = message;
+            TempData[SD.Success] = message.ToString();
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

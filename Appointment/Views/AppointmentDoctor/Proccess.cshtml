@@ -1,0 +1,67 @@
+﻿@model Appointment.ViewModels.AppointmentClinicViewModel
+
+<form asp-controller="AppointmentDoctor" asp-action="ProccessRequest">
+    <input type="hidden" asp-for="IdAppointment" />
+    <div class="card">
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group row">
+                        <label class="col-md-2" asp-for="DateAppointment">Tanggal</label>
+                        <div class=" col-md-3">
+                            <input asp-for="DateAppointment" readonly class="form-control" />
+                            <span asp-validation-for="DateAppointment" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2" asp-for="TimeAppointment">Jam</label>
+                        <div class=" col-md-3">
+                            <input asp-for="TimeAppointment" readonly class="form-control" />
+                            <span asp-validation-for="TimeAppointment" class="text-danger"></span>
+                        </div>
+                    </div>
+                     <div class="form-group row">
+                        <label class="col-md-2" asp-for="Age">Age</label>
+                        <div class=" col-md-3">
+                            <input asp-for="Age" readonly class="form-control" />
+                            <span asp-validation-for="Age" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2" asp-for="Spesialis">Spesialis</label>
+                        <div class=" col-md-3">
+                            <input asp-for="Spesialis" readonly class="form-control" />
+                            <span asp-validation-for="Spesialis" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2" asp-for="ReasonOfSick">Keluhan Patient</label>
+                        <div class=" col-md-10">
+                            <textarea rows="5" asp-for="ReasonOfSick" readonly class="form-control"></textarea>
+                            <span asp-validation-for="ReasonOfSick" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2" asp-for="HistoryOfSick">Sebutkan Riwayat Penyakit Anda</label>
+                        <div class=" col-md-10">
+                            <textarea rows="5" asp-for="HistoryOfSick" readonly class="form-control"></textarea>
+                            <span asp-validation-for="HistoryOfSick" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-block float-left form-control col-md-2">Back</a>
+                        <div class=" col-md-5">
+                            <input type="submit" value="Approve Request" asp-controller="AppointmentDoctor" asp-action="ApproveRequest" asp-route-idAppointment="@Model.IdAppointment" class="btn btn-success form-control text-white" />
+                        </div>
+                        <div class=" col-md-5">
+                            <input type="submit" value="Reject Request" asp-controller="AppointmentDoctor" asp-action="RejectRequest" asp-route-idAppointment="@Model.IdAppointment" class="btn btn-danger form-control text-white" />
+                        </div>
+                    </div>
+                    @*<label>@ViewBag.Message</label>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

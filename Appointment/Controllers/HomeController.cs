@@ -87,6 +87,7 @@ namespace Appointment.Controllers
             foreach (var data in transacationDoctor)
             {
                 AppointmentClinicViewModel item = new AppointmentClinicViewModel();
+                item.IdAppointment = data.IdAppointment;
                 item.Spesialis = data.SpesialisName;
                 item.PatientName = data.Patient;
                 item.DoctorName = data.Doctor;
