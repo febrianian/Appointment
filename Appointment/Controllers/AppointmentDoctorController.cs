@@ -409,7 +409,7 @@ namespace Appointment.Controllers
                        join userP in _context.Users on app.UserIdPatient equals userP.Id
                        join userD in _context.Users on app.UserIdDoctor equals userD.Id
                        join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
-                       where app.Status == "A"
+                       where app.Status == "A" orderby app.IdAppointment descending
                        select new
                        {
                            app.IdAppointment,

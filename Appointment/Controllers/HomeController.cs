@@ -30,7 +30,7 @@ namespace Appointment.Controllers
         {
             List<AppointmentClinicViewModel> itemsTransactionPatient = new List<AppointmentClinicViewModel>();
             List<AppointmentClinicViewModel> itemsTransactionDoctor = new List<AppointmentClinicViewModel>();
-            var transactionPatient = _context.AppointmentClinic.Where(i => i.UserCreated == User.Identity.Name).ToList();
+            var transactionPatient = _context.AppointmentClinic.Where(i => i.UserCreated == User.Identity.Name).OrderByDescending(i => i.IdAppointment).ToList();
 
             foreach(var data in transactionPatient)
             {
@@ -66,7 +66,7 @@ namespace Appointment.Controllers
             var transacationDoctor = from app in _context.AppointmentClinic
                                      join spes in _context.Spesialis on app.IdSpesialis equals spes.Id
                                      join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
-                                     where app.Status == "A" && app.UserIdDoctor == user
+                                     where app.Status == "A" && app.UserIdDoctor == user orderby app.IdAppointment descending
                                      select new
                                      {
                                          app.IdAppointment,
