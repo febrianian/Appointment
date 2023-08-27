@@ -8,6 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using System.Net;
 using X.PagedList;
+using ZXing;
+using System.IO;
+using ZXing.Windows.Compatibility;
+using ZXing.QrCode;
+using System.Drawing.Printing;
+using System.Net.Mail;
+using System.Net.Mime;
+using Org.BouncyCastle.Utilities.Net;
+using ContentDisposition = MimeKit.ContentDisposition;
 
 namespace Appointment.Controllers
 {
@@ -15,11 +24,13 @@ namespace Appointment.Controllers
     {
         private readonly AppointmentContext _context;
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _environment;
 
-        public AppointmentDoctorController(AppointmentContext context, IConfiguration config)
+        public AppointmentDoctorController(AppointmentContext context, IConfiguration config, IWebHostEnvironment environment)
         {
             _context = context;
             _config = config;
+            _environment = environment;
         }
 
         public string GenerateTicketNo(string day, string month, string year)
@@ -36,6 +47,45 @@ namespace Appointment.Controllers
             ticketNo = getNo.ToString("D6") + "-" + day + month + year;
 
             return ticketNo;
+        }
+
+        private byte[] GenerateQRCode(string qrCodeText)
+        {
+            var writer = new BarcodeWriter();
+            writer.Format = BarcodeFormat.QR_CODE;
+            writer.Options = new ZXing.Common.EncodingOptions
+            {
+                Width = 200, // Adjust the size as needed
+                Height = 200,
+                Margin = 0
+            };
+
+            var bitmap = writer.Write(qrCodeText);
+
+            using (var stream = new MemoryStream())
+            {
+                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                return stream.ToArray();
+            }
+        }
+
+        public string GenerateRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            var randomString = new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+            return randomString;
+        }
+
+        public string GenerateTicketWithRandomToken(string day, string month, string year)
+        {
+            var ticketNo = GenerateTicketNo(day, month, year); // Use your existing function
+            var randomToken = GenerateRandomString(10); // Generate a random token of length 10
+
+            var combinedTicket = $"{ticketNo}-{randomToken}";
+
+            return combinedTicket;
         }
 
         public async Task SentEmail(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress)
@@ -55,6 +105,75 @@ namespace Appointment.Controllers
 
             string Subject = subject;
             bodyBuilder.HtmlBody = htmlBody;
+
+            mimeMessage.From.Add(new MailboxAddress(FromAdressTitle, FromAddress));
+            mimeMessage.Subject = Subject;
+            mimeMessage.Body = bodyBuilder.ToMessageBody();
+            ToAddressTitle = toAddressTitle;
+            ToAddress = toAddress;
+
+            if (dev == "false")
+            {
+                mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
+            }
+            else if (dev == "true")
+            {
+                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+            }
+
+            //Check configuration
+            var serverAddress = _config["EmailSettings:SmtpServer"];
+            var emailPort = _config["EmailSettings:Port"];
+            var emailUsername = _config["EmailSettings:Username"];
+            var emailPass = _config["EmailSettings:Password"];
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                try
+                {
+                    client.Connect(serverAddress, Convert.ToInt32(emailPort), false);
+                    client.Authenticate(emailUsername, emailPass);
+                    client.Send(mimeMessage);
+                    client.Disconnect(true);
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+                finally
+                {
+                    if (client.IsConnected == true)
+                    {
+                        client.Disconnect(true);
+                    }
+                }
+            }
+        }
+
+        public async Task SentEmailAttachment(string subject, string htmlBody, string status, string from, bool show, string toAddressTitle, string toAddress, IEnumerable<MimePart> attachments)
+        {
+            //Check configuration
+            var dev = _config["EmailSettings:DeveloperMode"];
+            //send Email Here
+            string FromAddress = _config["EmailSettings:SenderEmail"];
+            string FromAdressTitle = _config["EmailSettings:SenderName"];
+            string ToAddress = "";
+            string ToAddressTitle = "";
+
+            var bodyBuilder = new BodyBuilder();
+            var mimeMessage = new MimeMessage();
+            ToAddress = "";
+            ToAddressTitle = "";
+
+            string Subject = subject;
+            bodyBuilder.HtmlBody = htmlBody;
+            // Attach the provided attachments
+            foreach (var attachment in attachments)
+            {
+                bodyBuilder.Attachments.Add(attachment);
+            }
+
             mimeMessage.From.Add(new MailboxAddress(FromAdressTitle, FromAddress));
             mimeMessage.Subject = Subject;
             mimeMessage.Body = bodyBuilder.ToMessageBody();
@@ -312,7 +431,7 @@ namespace Appointment.Controllers
 
                         return View("Index", vm);
                     }
-                    else 
+                    else
                     {
                         model.IdSpesialis = vm.IdSpesialis;
                         model.UserIdPatient = user.Id;
@@ -358,7 +477,7 @@ namespace Appointment.Controllers
                         //ViewData["Message"] = message;
                         TempData[SD.Success] = message.ToString();
                         return RedirectToAction("Index", "Home");
-                    }                    
+                    }
                 }
             }
 
@@ -409,7 +528,8 @@ namespace Appointment.Controllers
                        join userP in _context.Users on app.UserIdPatient equals userP.Id
                        join userD in _context.Users on app.UserIdDoctor equals userD.Id
                        join stat in _context.StatusTransaction on app.IdStatus equals stat.IdStatus
-                       where app.Status == "A" orderby app.IdAppointment descending
+                       where app.Status == "A"
+                       orderby app.IdAppointment descending
                        select new
                        {
                            app.IdAppointment,
@@ -547,6 +667,90 @@ namespace Appointment.Controllers
             vm.DateCreated = transaction.DateCreated;
             return View(vm);
         }
+        //private string GenerateQRCodeImageBase64(string qrText)
+        //{
+        //    var width = 250;
+        //    var height = 250;
+        //    var margin = 0;
+
+        //    var qrCodeWriter = new ZXing.BarcodeWriterPixelData
+        //    {
+        //        Format = ZXing.BarcodeFormat.QR_CODE,
+        //        Options = new QrCodeEncodingOptions
+        //        {
+        //            Height = height,
+        //            Width = width,
+        //            Margin = margin
+        //        }
+        //    };
+
+        //    var pixelData = qrCodeWriter.Write(qrText);
+
+        //    using (var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb))
+        //    {
+        //        using (var ms = new MemoryStream())
+        //        {
+        //            var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+        //            try
+        //            {
+        //                System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
+        //            }
+        //            finally
+        //            {
+        //                bitmap.UnlockBits(bitmapData);
+        //            }
+
+        //            using (var msPng = new MemoryStream())
+        //            {
+        //                // Save the image to stream as PNG
+        //                bitmap.Save(msPng, System.Drawing.Imaging.ImageFormat.Png);
+        //                return "data:image/png;base64," + Convert.ToBase64String(msPng.ToArray());
+        //            }
+        //        }
+        //    }
+        //}
+        private string GenerateQRCodeImageBase64(string qrText)
+        {
+            var width = 250;
+            var height = 250;
+            var margin = 0;
+
+            var qrCodeWriter = new ZXing.BarcodeWriterPixelData
+            {
+                Format = ZXing.BarcodeFormat.QR_CODE,
+                Options = new QrCodeEncodingOptions
+                {
+                    Height = height,
+                    Width = width,
+                    Margin = margin
+                }
+            };
+
+            var pixelData = qrCodeWriter.Write(qrText);
+
+            using (var bitmap = new System.Drawing.Bitmap(pixelData.Width, pixelData.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb))
+            {
+                var bitmapData = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, pixelData.Width, pixelData.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+                try
+                {
+                    System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
+                }
+                finally
+                {
+                    bitmap.UnlockBits(bitmapData);
+                }
+                var outputPath = Path.Combine(_environment.WebRootPath, "qrcodes");
+                Directory.CreateDirectory(outputPath);
+
+                var fileName = qrText + ".Jpeg";
+                var filePath = Path.Combine(outputPath, fileName);
+
+                // Save the image as PNG
+                bitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                return filePath; // You can return the file path if needed
+            }
+        }
 
         [Authorize(Roles = "Admin, Doctor")]
         [HttpPost]
@@ -557,16 +761,17 @@ namespace Appointment.Controllers
             var month = vm.DateAppointment.ToString("MM");
             var year = vm.DateAppointment.ToString("yyyy");
             var transaction = _context.AppointmentClinic.Where(i => i.IdAppointment == vm.IdAppointment).Single();
-
+            var token = GenerateTicketWithRandomToken(day, month, year);
             //update status
             transaction.IdStatus = "4";
             transaction.TicketNo = GenerateTicketNo(day, month, year);
             transaction.DoctorNote = vm.DoctorNote;
             transaction.DateModified = DateTime.Now;
             transaction.UserModified = User.Identity.Name;
+            transaction.QRCode = token;
+            transaction.QRCodePath = GenerateQRCodeImageBase64(token);
             _context.Update(transaction);
             _context.SaveChanges();
-
             var spesialis = _context.Spesialis.Where(x => x.Id == transaction.IdSpesialis).Single().SpesialisName;
             string subject = "Appoitment " + spesialis;
             string htmlBody = "Details are as follows:<br/><br/>";
@@ -579,14 +784,29 @@ namespace Appointment.Controllers
             htmlBody += "<tr><td>Status</td><td>: " + _context.StatusTransaction.Where(i => i.IdStatus == transaction.IdStatus).Single().StatusName + "</td></tr>";
             htmlBody += "</table><br/><br/>";
             htmlBody += "<br/><br/>";
-            htmlBody += "<center><small><b><i>This email is generated automatically by system.<br/>Please do not reply to this email.</i></b></small></center>";
+            htmlBody += "<tr><td>QR Code</td><td>: <img src='data:image/png;base64," + transaction.QRCodePath + "' /></td></tr>";
+            htmlBody += "<tr><td>QR Code</td><td>: <img src='" + Url.Content("~/" + transaction.QRCodePath) + "' /></td></tr>";
+            htmlBody += "<tr><td>QR Code</td><td>: <img src='cid:qrcodeimage' /></td></tr>";
+            htmlBody += "</table><br/><br/>";
+
+            var attachments = new List<MimePart>
+            {
+                new MimePart
+                {
+                    Content = new MimeContent(System.IO.File.OpenRead(transaction.QRCodePath), ContentEncoding.Default),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName = transaction.QRCode + ".jpeg" // Name of the file
+                }
+            };
+
 
             string from = "Appointment Clinic";
             string status = "Success";
             string toTitle = transaction.UserCreated;
             string toEmail = transaction.UserCreated;
             transaction.DoctorNote = vm.DoctorName;
-            await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
+            await SentEmailAttachment(subject, htmlBody, status, from, true, toTitle, toEmail, attachments);
             message = "Successfully Submited!";
             //ViewData["Message"] = message;
             TempData[SD.Success] = message.ToString();

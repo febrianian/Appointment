@@ -3,6 +3,7 @@ using System;
 using Appointment.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Appointment.Migrations
 {
     [DbContext(typeof(AppointmentContext))]
-    partial class AppointmentContextModelSnapshot : ModelSnapshot
+    [Migration("20230826233043_AddQrCode")]
+    partial class AddQrCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,9 +135,6 @@ namespace Appointment.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("QRCode")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("QRCodePath")
                         .HasColumnType("longtext");
 
                     b.Property<string>("ReasonOfSick")

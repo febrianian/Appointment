@@ -23,5 +23,7 @@ namespace Appointment.Models
         public DateTime DateModified { get; set; }
         public string TicketNo { get; set; }
         public string DoctorNote { get; set; }
+        public string QRCode { get; set; }
+        public string QRCodePath { get; set; }
     }
 }
