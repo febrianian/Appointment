@@ -9,5 +9,6 @@ namespace Appointment.Models
         public DateTime BirthDate { get; set; }
         public string Address { get; set; }
         public string IdNumber { get; set; }
+        public string LastLogin { get; set; }
     }
 }

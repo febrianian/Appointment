@@ -113,12 +113,13 @@ namespace Appointment.Controllers
             ToAddress = toAddress;
 
             if (dev == "false")
-            {
+            {                
                 mimeMessage.To.Add(new MailboxAddress(toAddressTitle, toAddress));
             }
             else if (dev == "true")
             {
                 mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+                mimeMessage.To.Add(new MailboxAddress("chantikaratutria11@gmail.com", "chantikaratutria11@gmail.com"));
             }
 
             //Check configuration
@@ -784,21 +785,21 @@ namespace Appointment.Controllers
             htmlBody += "<tr><td>Status</td><td>: " + _context.StatusTransaction.Where(i => i.IdStatus == transaction.IdStatus).Single().StatusName + "</td></tr>";
             htmlBody += "</table><br/><br/>";
             htmlBody += "<br/><br/>";
-            htmlBody += "<tr><td>QR Code</td><td>: <img src='data:image/png;base64," + transaction.QRCodePath + "' /></td></tr>";
-            htmlBody += "<tr><td>QR Code</td><td>: <img src='" + Url.Content("~/" + transaction.QRCodePath) + "' /></td></tr>";
-            htmlBody += "<tr><td>QR Code</td><td>: <img src='cid:qrcodeimage' /></td></tr>";
+            //htmlBody += "<tr><td>QR Code</td><td>: <img src='data:image/png;base64," + transaction.QRCodePath + "' /></td></tr>";
+            //htmlBody += "<tr><td>QR Code</td><td>: <img src='" + Url.Content("~/" + transaction.QRCodePath) + "' /></td></tr>";
+            //htmlBody += "<tr><td>QR Code</td><td>: <img src='cid:qrcodeimage' /></td></tr>";
             htmlBody += "</table><br/><br/>";
 
-            var attachments = new List<MimePart>
-            {
-                new MimePart
-                {
-                    Content = new MimeContent(System.IO.File.OpenRead(transaction.QRCodePath), ContentEncoding.Default),
-                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
-                    ContentTransferEncoding = ContentEncoding.Base64,
-                    FileName = transaction.QRCode + ".jpeg" // Name of the file
-                }
-            };
+            //var attachments = new List<MimePart>
+            //{
+            //    new MimePart
+            //    {
+            //        Content = new MimeContent(System.IO.File.OpenRead(transaction.QRCodePath), ContentEncoding.Default),
+            //        ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+            //        ContentTransferEncoding = ContentEncoding.Base64,
+            //        FileName = transaction.QRCode + ".jpeg" // Name of the file
+            //    }
+            //};
 
 
             string from = "Appointment Clinic";
@@ -806,7 +807,7 @@ namespace Appointment.Controllers
             string toTitle = transaction.UserCreated;
             string toEmail = transaction.UserCreated;
             transaction.DoctorNote = vm.DoctorName;
-            await SentEmailAttachment(subject, htmlBody, status, from, true, toTitle, toEmail, attachments);
+            await SentEmail(subject, htmlBody, status, from, true, toTitle, toEmail);
             message = "Successfully Submited!";
             //ViewData["Message"] = message;
             TempData[SD.Success] = message.ToString();
