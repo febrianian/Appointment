@@ -224,5 +224,11 @@ namespace Appointment.Controllers
 
             return View("Edit", model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetData()
+        {
+            return View("");
+        }
     }
 }
