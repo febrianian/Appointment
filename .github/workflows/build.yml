@@ -47,4 +47,3 @@ jobs:
           dotnet build --configuration Release
           dotnet test --collect "Code Coverage"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN_SECRET }}"
-          echo ${{ secrets.SONAR_TOKEN_SECRET }} | sed 's/./& /g'
