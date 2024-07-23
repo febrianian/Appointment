@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include=".github\workflows\build.yml" />
     <None Include="Views\Account\Login.cshtml" />
   </ItemGroup>
 
