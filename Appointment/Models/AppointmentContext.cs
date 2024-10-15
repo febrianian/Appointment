@@ -12,5 +12,6 @@ namespace Appointment.Models
         public DbSet<SpesialisSchedule> SpesialisSchedule { get; set; }
         public DbSet<StatusTransaction> StatusTransaction { get; set; }
         public DbSet<Student> Student { get; set; }
+        public DbSet<Materi> Materi { get; set; }
     }
 }
