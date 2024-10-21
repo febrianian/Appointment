@@ -119,7 +119,7 @@ namespace Appointment.Controllers
             else if (dev == "true")
             {
                 mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
-                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com"));
+                mimeMessage.To.Add(new MailboxAddress("febrian.evolution@gmail.com", "febrian.evolution@gmail.com")); 
             }
 
             //Check configuration
