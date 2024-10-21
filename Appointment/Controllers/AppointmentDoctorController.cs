@@ -363,7 +363,18 @@ namespace Appointment.Controllers
             var schedule = _context.SpesialisSchedule.Where(i => i.IdSpesialis == vm.IdSpesialis && i.UserId == vm.UserId && i.Status == "A");
             DateTime selectTime = DateTime.ParseExact(vm.TimeAppointment, "H:mm", System.Globalization.CultureInfo.InvariantCulture);
             int hour = selectTime.Hour;
-            var scheduleDay = schedule.Where(i => i.ScheduleDay == dayOfWeekString).Single().ScheduleDay;
+
+            //check if day schedule are not found
+            if(dayOfWeek.ToString() != schedule.Single().ScheduleDay)
+            {
+                message = "Day Not Found";
+                //ViewData["Message"] = message;
+                TempData[SD.Warning] = message.ToString();
+                return RedirectToAction("Index", new { userId = vm.UserId, idSpesialis = vm.IdSpesialis });                
+            }
+
+
+            var scheduleDay = schedule.Where(i => i.ScheduleDay == dayOfWeek.ToString()).Single().ScheduleDay;
 
             var doctor = _context.Users.Where(u => u.Id == vm.UserId).Single();
             var user = _context.Users.Where(u => u.UserName == User.Identity.Name).Single();
@@ -396,7 +407,7 @@ namespace Appointment.Controllers
 
                     ViewData["Hours"] = new SelectList(duration, "Value", "Text");
 
-                    return View("Index", vm);
+                    return RedirectToAction("Index", new { userId = vm.UserId, idSpesialis = vm.IdSpesialis });
                 }
 
                 AppointmentClinic model = new AppointmentClinic();
@@ -430,7 +441,7 @@ namespace Appointment.Controllers
 
                         ViewData["Hours"] = new SelectList(duration, "Value", "Text");
 
-                        return View("Index", vm);
+                        return RedirectToAction("Index", new { userId = vm.UserId, idSpesialis = vm.IdSpesialis });
                     }
                     else
                     {

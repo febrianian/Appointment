@@ -92,12 +92,43 @@ namespace Appointment.Controllers
 
             foreach (var itemusr in sortedItems.ToPagedList(pageNumber, pageSize))
             {
+                var dayName = itemusr.ScheduleDay;
+
+                if(dayName == "Monday")
+                {
+                    dayName = "Senin";
+                }
+                else if (dayName == "Tuesday")
+                {
+                    dayName = "Selasa";
+                }
+                else if (dayName == "Wednesday")
+                {
+                    dayName = "Rabu";
+                }
+                else if (dayName == "Thursday")
+                {
+                    dayName = "Kamis";
+                }
+                else if (dayName == "Friday")
+                {
+                    dayName = "Jum'at";
+                }
+                else if (dayName == "Saturday")
+                {
+                    dayName = "Sabtu";
+                }
+                else
+                {
+                    dayName = "Minggu";
+                }
+
                 SpesialisScheduleViewModel item = new SpesialisScheduleViewModel();
                 item.IdSpesialisSchedule = itemusr.IdSpesialisSchedule;
                 item.Name = itemusr.Name;
                 item.Status = itemusr.Status;
                 item.SpesialisName = itemusr.SpesialisName;
-                item.ScheduleDay = itemusr.ScheduleDay;
+                item.ScheduleDay = dayName;
                 item.StartDate = itemusr.StartDate.ToString("HH:mm");
                 item.EndDate = itemusr.EndDate.ToString("HH:mm");
 
@@ -143,13 +174,13 @@ namespace Appointment.Controllers
             ViewData["DoctorList"] = new SelectList(doctor, "Id", "Name");
 
             var dayList = new List<SelectListItem>();
-            dayList.Add(new SelectListItem { Text = "Senin", Value = "Senin" });
-            dayList.Add(new SelectListItem { Text = "Selasa", Value = "Selasa" });
-            dayList.Add(new SelectListItem { Text = "Rabu", Value = "Rabu" });
-            dayList.Add(new SelectListItem { Text = "Kamis", Value = "Kamis" });
-            dayList.Add(new SelectListItem { Text = "Jumat", Value = "Jumat" });
-            dayList.Add(new SelectListItem { Text = "Sabtu", Value = "Sabtu" });
-            dayList.Add(new SelectListItem { Text = "Minggu", Value = "Minggu" });
+            dayList.Add(new SelectListItem { Text = "Senin", Value = "Monday" });
+            dayList.Add(new SelectListItem { Text = "Selasa", Value = "Tuesday" });
+            dayList.Add(new SelectListItem { Text = "Rabu", Value = "Wednesday" });
+            dayList.Add(new SelectListItem { Text = "Kamis", Value = "Thursday" });
+            dayList.Add(new SelectListItem { Text = "Jumat", Value = "Friday" });
+            dayList.Add(new SelectListItem { Text = "Sabtu", Value = "Saturday" });
+            dayList.Add(new SelectListItem { Text = "Minggu", Value = "Sunday" });
             ViewData["DayList"] = new SelectList(dayList, "Value", "Text");
 
             int minute = 60;
