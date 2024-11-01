@@ -358,7 +358,7 @@ namespace Appointment.Controllers
             var message = "";
             DateTime inputDateTime = vm.DateAppointment.Date;
             DayOfWeek dayOfWeek = inputDateTime.DayOfWeek;
-            string dayOfWeekString = GetBahasaIndonesiaDayOfWeek(dayOfWeek);
+            string dayOfWeekString = GetCustomEnglishDayOfWeek(dayOfWeek);
 
             var schedule = _context.SpesialisSchedule.Where(i => i.IdSpesialis == vm.IdSpesialis && i.UserId == vm.UserId && i.Status == "A");
             DateTime selectTime = DateTime.ParseExact(vm.TimeAppointment, "H:mm", System.Globalization.CultureInfo.InvariantCulture);
@@ -372,7 +372,6 @@ namespace Appointment.Controllers
                 TempData[SD.Warning] = message.ToString();
                 return RedirectToAction("Index", new { userId = vm.UserId, idSpesialis = vm.IdSpesialis });                
             }
-
 
             var scheduleDay = schedule.Where(i => i.ScheduleDay == dayOfWeek.ToString()).Single().ScheduleDay;
 
@@ -389,7 +388,8 @@ namespace Appointment.Controllers
                 int timeStartHour = startTime.Hour; // 6
                 int timeEndHour = endTime.Hour; // 16              
 
-                if (hour < timeStartHour && hour > timeEndHour)
+                //if (hour < timeStartHour && hour > timeEndHour)
+                if (hour < timeStartHour || hour > timeEndHour)
                 {
                     message = "Your time out of selection range";
                     //ViewData["Message"] = message;
@@ -400,9 +400,6 @@ namespace Appointment.Controllers
                     for (int i = 1; i <= 24; i++)
                     {
                         duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":00" });
-                        //minute = minute + 30;
-                        //duration.Add(new SelectListItem { Value = (i + ":00").ToString(), Text = i + ":30" });
-                        //minute = minute + 30;
                     }
 
                     ViewData["Hours"] = new SelectList(duration, "Value", "Text");
@@ -493,7 +490,8 @@ namespace Appointment.Controllers
                 }
             }
 
-            return View(vm);
+            TempData[SD.Error] = "Something Wrong";
+            return RedirectToAction("Index", new { userId = vm.UserId, idSpesialis = vm.IdSpesialis });
         }
 
         static string GetBahasaIndonesiaDayOfWeek(DayOfWeek dayOfWeek)
@@ -517,6 +515,21 @@ namespace Appointment.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Invalid day of the week.");
             }
+        }
+
+        static string GetCustomEnglishDayOfWeek(DayOfWeek dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                DayOfWeek.Sunday => "Sunday",
+                DayOfWeek.Monday => "Monday",
+                DayOfWeek.Tuesday => "Tuesday",
+                DayOfWeek.Wednesday => "Wednesday",
+                DayOfWeek.Thursday => "Thursday",
+                DayOfWeek.Friday => "Friday",
+                DayOfWeek.Saturday => "Saturday",
+                _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), "Invalid day of the week.")
+            };
         }
 
         [Authorize(Roles = "Admin")]
